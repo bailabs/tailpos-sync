@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include tailpos_sync *.css
+recursive-include tailpos_sync *.csv
+recursive-include tailpos_sync *.html
+recursive-include tailpos_sync *.ico
+recursive-include tailpos_sync *.js
+recursive-include tailpos_sync *.json
+recursive-include tailpos_sync *.md
+recursive-include tailpos_sync *.png
+recursive-include tailpos_sync *.py
+recursive-include tailpos_sync *.svg
+recursive-include tailpos_sync *.txt
+recursive-exclude tailpos_sync *.pyc
