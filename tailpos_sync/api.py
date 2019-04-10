@@ -3,8 +3,14 @@ import frappe
 
 @frappe.whitelist(allow_guest=True)
 def fetch_items():
-    items = frappe.get_all('Item', fields=['name', 'standard_rate'])
+    items = frappe.get_all('Item', fields=['name', 'standard_rate', 'category'])
     return post_process(items)
+
+
+@frappe.whitelist(allow_guest=True)
+def fetch_categories():
+    categories = frappe.get_all('Categories', fields=['name'])
+    return categories
 
 
 def post_process(arr_obj):
