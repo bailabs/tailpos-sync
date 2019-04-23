@@ -130,4 +130,6 @@ scheduler_events = {
 # 	"frappe.desk.doctype.event.event.get_events": "tailpos_erpnext.event.get_events"
 # }
 
-fixtures = ["Custom Field"]
+fixtures = [
+    {"dt": "Custom Field", "filters": [["dt", "in", ("Item", "Customer", "Deleted Document")]]},
+]
