@@ -2,13 +2,7 @@
 from __future__ import unicode_literals
 import frappe
 
-__version__ = '1.1.1'
-
-# Changelog
-# =========
-# - Created Tail Settings where you can add button
-# =========
-
+__version__ = '1.1.2'
 
 @frappe.whitelist()
 def sync():

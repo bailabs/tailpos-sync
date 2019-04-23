@@ -8,3 +8,6 @@
 
 ### v1.1.1 [23 апреля 2019]
 - Updated hooks for fixtures, removed unnecessary fields
+
+### v1.1.2 [23 апреля 2019]
+- Syncing for items limited when `In TailPOS` is checked

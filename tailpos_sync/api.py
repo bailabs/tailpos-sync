@@ -3,7 +3,7 @@ import frappe
 
 @frappe.whitelist(allow_guest=True)
 def fetch_items():
-    items = frappe.get_all('Item', fields=['name', 'standard_rate', 'category'])
+    items = frappe.get_all('Item', filters={'in_tailpos': 1}, fields=['name', 'standard_rate', 'category'])
     return post_process(items)
 
 
