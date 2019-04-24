@@ -15,7 +15,7 @@ class Categories(Document):
         self.name = self.description
 
     def before_insert(self):
-        self.id = uuid.uuid4()
+        self.id = str(uuid.uuid4())
 
     def after_insert(self):
         colors = {
