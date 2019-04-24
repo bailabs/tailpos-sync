@@ -9,7 +9,6 @@ def tailpos_test(data):
 
         shift_end_from = data['end_from'] + " 00:00:00"
         shift_end_to = data['end_to'] + " 23:59:59"
-        shift_array = []
         shift_data = frappe.db.sql(""" SELECT * FROM `tabShifts` WHERE shift_end BETWEEN %s AND %s """,
                                    (shift_end_from, shift_end_to), as_dict=True)
         return {"data": shift_data}

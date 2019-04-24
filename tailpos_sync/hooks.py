@@ -83,15 +83,9 @@ doc_events = {
     "User": {
         "after_insert": "tailpos_sync.events.add_role",
     },
-    "Receipts": {
-        "on_update": "tailpos_sync.utils.generate_sales_invoice_from_receipt"
-    },
     "Item": {
         "validate": "tailpos_sync.utils.save_item",
         "before_save": "tailpos_sync.utils.set_item_uuid"
-    },
-    "Customer": {
-        "validate": "tailpos_sync.utils.save_customer",
     },
 }
 

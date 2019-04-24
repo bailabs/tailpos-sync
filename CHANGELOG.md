@@ -18,3 +18,9 @@
 ### v1.1.4 [24 апреля 2019]
 - API endpoint for not force sync is updated for In TailPOS filter
 - Set Item UUID if not set and that In TailPOS is ticked
+
+### v1.2.0 [24 апреля 2019]
+- Clean unnecessary codes
+- Added POS Profile field on Tail Settings
+- Re-layout Receipts
+- Added function, "generated_si"
