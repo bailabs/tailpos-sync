@@ -88,6 +88,7 @@ doc_events = {
     },
     "Item": {
         "validate": "tailpos_sync.utils.save_item",
+        "before_save": "tailpos_sync.utils.set_item_uuid"
     },
     "Customer": {
         "validate": "tailpos_sync.utils.save_customer",

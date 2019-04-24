@@ -1,5 +1,4 @@
-
-import frappe,json
+import frappe
 import uuid
 
 
@@ -176,6 +175,7 @@ def save_item(doc,method):
     if doc.date_updated == None:
         doc.date_updated = doc.modified
 
+
 @frappe.whitelist()
 def save_customer(doc, method):
 
@@ -187,6 +187,12 @@ def save_customer(doc, method):
         doc.territory = 'All Territories'
     except Exception:
         print(frappe.get_traceback())
+
+
+def set_item_uuid(doc, method):
+    if doc.in_tailpos and not doc.id:
+        doc.id = str(uuid.uuid4())
+
 
 def test():
     number = frappe.db.sql("""SELECT COUNT(*) as count FROM `tabReceipts` WHERE generated=0""", as_dict=1)
