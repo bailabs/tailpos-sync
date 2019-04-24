@@ -5,11 +5,16 @@ def get_tables_for_sync():
     return ['Item', 'Customer', 'Categories', 'Discounts', 'Attendants']
 
 
-def get_table_select_query(table):
-    if table == 'Item':
-        return "SELECT * FROM `tabItem` WHERE in_tailpos=1"
+def get_table_select_query(table, force_sync=True):
+    query = "SELECT * FROM `tab{0}`".format(table)
 
-    return "SELECT * FROM `tab{0}`".format(table)
+    if not force_sync:
+        query = query + " WHERE `modified` > `date_updated`"
+
+    if table == 'Item':
+        query = query + " AND in_tailpos=1"
+
+    return query
 
 
 def insert_data(i, data, frappe_table, receipt_total):
@@ -125,31 +130,31 @@ def force_sync_from_erpnext_to_tailpos():
             query = get_table_select_query(table)
             query_data = frappe.db.sql(query, as_dict=True)
 
-            for x in query_data:
+            for row in query_data:
                 data.append({
                     'tableNames': table,
-                    'syncObject': x
+                    'syncObject': row
                 })
-                frappe.db.sql("UPDATE `tab" + table + "` SET `date_updated`=`modified` where id=%s", x.id)
+                frappe.db.sql("UPDATE `tab" + table + "` SET `date_updated`=`modified` where id=%s", row.id)
     except Exception:
         print(frappe.get_traceback())
     return data
 
 
 def sync_from_erpnext_to_tailpos():
-    table_names = ['Item', 'Categories', 'Discounts', 'Attendants', 'Customer']
     data = []
-    for i in table_names:
+    tables = get_tables_for_sync()
 
-        dataFromDb = frappe.db.sql("SELECT * FROM `tab" + i + "` WHERE `modified` > `date_updated`", as_dict=True)
+    for table in tables:
+        query_data = frappe.db.sql(get_table_select_query(table, False), as_dict=True)
 
-        if len(dataFromDb) > 0:
-            for x in dataFromDb:
+        if len(query_data) > 0:
+            for x in query_data:
                 data.append({
-                    'tableNames': i,
+                    'tableNames': table,
                     'syncObject': x
                 })
-                frappe.db.sql("UPDATE `tab" + i + "` SET `date_updated`=`modified` where id=%s", (x.id))
+                frappe.db.sql("UPDATE `tab" + table + "` SET `date_updated`=`modified` where id=%s", x.id)
     return data
 
 
