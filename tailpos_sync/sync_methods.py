@@ -1,6 +1,17 @@
 import frappe, json, datetime
 
 
+def get_tables_for_sync():
+    return ['Item', 'Customer', 'Categories', 'Discounts', 'Attendants']
+
+
+def get_table_select_query(table):
+    if table == 'Item':
+        return "SELECT * FROM `tabItem` WHERE in_tailpos=1"
+
+    return "SELECT * FROM `tab{0}`".format(table)
+
+
 def insert_data(i, data, frappe_table, receipt_total):
     for key, value in data[i]['syncObject'].iteritems():
         print("nisuloddddddd")
@@ -77,7 +88,7 @@ def insert_data(i, data, frappe_table, receipt_total):
 
 
 def deleted_documents():
-    tables = ["Item", "Categories", "Discounts", "Attendants", "Customer"]
+    tables = get_tables_for_sync()
     tableNames = ["Items", "Categories", "Discounts", "Attendants", "Customer"]
     returnArray = []
 
@@ -106,18 +117,20 @@ def deleted_documents():
 
 
 def force_sync_from_erpnext_to_tailpos():
-    try:
-        tableNames = ['Item', 'Categories', 'Discounts', 'Attendants', "Customer"]
-        data = []
-        for i in tableNames:
-            dataFromDb = frappe.db.sql("SELECT * FROM `tab" + i + "`", as_dict=True)
+    data = []
+    tables = get_tables_for_sync()
 
-            for x in dataFromDb:
+    try:
+        for table in tables:
+            query = get_table_select_query(table)
+            query_data = frappe.db.sql(query, as_dict=True)
+
+            for x in query_data:
                 data.append({
-                    'tableNames': i,
+                    'tableNames': table,
                     'syncObject': x
                 })
-                frappe.db.sql("UPDATE `tab" + i + "` SET `date_updated`=`modified` where id=%s", (x.id))
+                frappe.db.sql("UPDATE `tab" + table + "` SET `date_updated`=`modified` where id=%s", x.id)
     except Exception:
         print(frappe.get_traceback())
     return data

@@ -11,3 +11,6 @@
 
 ### v1.1.2 [23 апреля 2019]
 - Syncing for items limited when `In TailPOS` is checked
+
+### v1.1.3 [24 апреля 2019]
+- TailPOS app API endpoint updated to get only In TailPOS filtered Items
