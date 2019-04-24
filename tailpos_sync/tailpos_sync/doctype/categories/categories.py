@@ -9,12 +9,15 @@ import frappe
 import uuid
 import json
 
+
 class Categories(Document):
     def autoname(self):
         self.name = self.description
 
-    def after_insert(self):
+    def before_insert(self):
+        self.id = uuid.uuid4()
 
+    def after_insert(self):
         colors = {
             "Tomato": "tomato",
             "Fire Brick": "firebrick",

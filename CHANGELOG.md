@@ -24,3 +24,6 @@
 - Added POS Profile field on Tail Settings
 - Re-layout Receipts
 - Added function, "generated_si"
+
+### v1.2.1 [24 апреля 2019]
+- Categories self.id generate, fix for TailPOS category duplicate
