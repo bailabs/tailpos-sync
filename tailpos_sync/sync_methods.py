@@ -12,7 +12,8 @@ def get_table_select_query(table, force_sync=True):
         query = query + " WHERE `modified` > `date_updated`"
 
     if table == 'Item':
-        query = query + " AND in_tailpos=1"
+        connector = 'WHERE' if force_sync else 'AND'
+        query = query + " {0} in_tailpos=1".format(connector)
 
     return query
 
