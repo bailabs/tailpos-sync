@@ -27,3 +27,7 @@
 
 ### v1.2.1 [24 апреля 2019]
 - Categories self.id generate, fix for TailPOS category duplicate
+
+### v1.2.2 [25 апреля 2019]
+- Added Use Price List field on Tail Settings
+- Updated API endpoint for TailOrder to fetch Price List

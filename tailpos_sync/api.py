@@ -6,7 +6,14 @@ import frappe
 
 @frappe.whitelist(allow_guest=True)
 def fetch_items():
-    items = frappe.get_all('Item', filters={'in_tailpos': 1}, fields=['name', 'standard_rate', 'category'])
+    items = []
+    use_price_list = frappe.db.get_single_value('Tail Settings', 'use_price_list')
+
+    if use_price_list:
+        get_items_with_price_list_rate()
+    else:
+        items = frappe.get_all('Item', filters={'in_tailpos': 1}, fields=['name', 'category', 'standard_rate'])
+
     return post_process(items)
 
 
@@ -14,6 +21,15 @@ def fetch_items():
 def fetch_categories():
     categories = frappe.get_all('Categories', fields=['name'])
     return categories
+
+
+def get_items_with_price_list_rate():
+    pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
+    price_list = frappe.db.get_value('POS Profile', pos_profile, 'selling_price_list')
+
+    items = frappe.db.sql("""SELECT `tabItem`.name, `tabItem`.category, `tabItem Price`.price_list_rate as standard_rate FROM `tabItem` INNER JOIN `tabItem Price` ON `tabItem`.name = `tabItem Price`.item_code WHERE `tabItem`.in_tailpos = 1 AND `tabItem Price`.price_list=%s""", (price_list), as_dict=True)
+
+    return items
 
 
 def post_process(arr_obj):
