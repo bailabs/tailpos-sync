@@ -34,3 +34,6 @@
 
 ### v1.2.3 [26 апреля 2019]
 - Updated API endpoint for TailPOS to fetch Price List
+
+### v1.3.0 [26 апреля 2019]
+- MAJOR: TailPOS will be using name as naming
