@@ -142,3 +142,14 @@ def set_item_uuid(doc, method):
 def get_receipt_items(receipt):
     fields = ['item_name', 'price', 'qty']
     return frappe.get_all('Receipts Item', filters={'parent': receipt}, fields=fields)
+
+
+def get_items_with_price_list_query(columns=None):
+    pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
+    price_list = frappe.db.get_value('POS Profile', pos_profile, 'selling_price_list')
+
+    columns_str = ', '.join(columns) if columns else '*'
+
+    query = """SELECT %s FROM `tabItem` INNER JOIN `tabItem Price` ON `tabItem`.name = `tabItem Price`.item_code WHERE `tabItem`.in_tailpos = 1 AND `tabItem Price`.price_list='%s'""" % (columns_str, price_list)
+
+    return query

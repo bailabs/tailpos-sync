@@ -1,19 +1,53 @@
-import frappe, json, datetime
+import frappe
+
+import datetime
+import json
+
+from .utils import get_items_with_price_list_query
 
 
 def get_tables_for_sync():
     return ['Item', 'Customer', 'Categories', 'Discounts', 'Attendants']
 
 
+def get_item_query():
+    use_price_list = frappe.db.get_single_value('Tail Settings', 'use_price_list')
+
+    columns = [
+        'tabItem.id',
+        'tabItem.description',
+        'tabItem.stock_uom',
+        'tabItem.sku',
+        'tabItem.barcode',
+        'tabItem.category',
+        'tabItem.color',
+        'tabItem.shape',
+        'tabItem.color_or_image',
+        'tabItem.image',
+        'tabItem.favorite',
+        '`tabItem Price`.price_list_rate as standard_rate'
+    ]
+
+    standard_rate = 'standard_rate'
+
+    if use_price_list:
+        standard_rate = '`tabItem Price`.price_list_rate as standard_rate'
+
+    columns.append(standard_rate)
+
+    return get_items_with_price_list_query(columns)
+
+
 def get_table_select_query(table, force_sync=True):
+
     query = "SELECT * FROM `tab{0}`".format(table)
 
-    if not force_sync:
-        query = query + " WHERE `modified` > `date_updated`"
-
     if table == 'Item':
-        connector = 'WHERE' if force_sync else 'AND'
-        query = query + " {0} in_tailpos=1".format(connector)
+        query = get_item_query()
+
+    if not force_sync:
+        connector = " AND " if "WHERE" in query else " WHERE "
+        query = query + connector + "`modified` > `date_updated`"
 
     return query
 

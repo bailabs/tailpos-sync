@@ -31,3 +31,6 @@
 ### v1.2.2 [25 апреля 2019]
 - Added Use Price List field on Tail Settings
 - Updated API endpoint for TailOrder to fetch Price List
+
+### v1.2.3 [26 апреля 2019]
+- Updated API endpoint for TailPOS to fetch Price List
