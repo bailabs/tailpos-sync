@@ -15,7 +15,7 @@ def get_item_query():
 
     columns = [
         'tabItem.id',
-        'tabItem.description',
+        'tabItem.name',
         'tabItem.stock_uom',
         'tabItem.sku',
         'tabItem.barcode',
