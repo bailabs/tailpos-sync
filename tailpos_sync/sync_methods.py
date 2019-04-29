@@ -157,6 +157,7 @@ def deleted_documents():
 
 
 def force_sync_from_erpnext_to_tailpos():
+    # Fetch all data in ERPNext for selected tables
     data = []
     tables = get_tables_for_sync()
 
@@ -177,6 +178,7 @@ def force_sync_from_erpnext_to_tailpos():
 
 
 def sync_from_erpnext_to_tailpos():
+    # Fetch Updated or Added data in ERPNext for selected tables
     data = []
     tables = get_tables_for_sync()
 

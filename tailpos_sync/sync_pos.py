@@ -48,52 +48,48 @@ def pull_data(data):
 
 @frappe.whitelist()
 def sync_data(data):
-    # Check if there is Each and Weight in UOM
+    trash_object = data['trashObject']
+    tailpos_data = data['tailposData']
+    sync_type = data['typeOfSync']
+
     uom_check()
-    # Check if there are latest deleted records
     deleted_records = deleted_documents()
 
     # Delete records
-    delete_records(data['trashObject'])
+    delete_records(trash_object)
 
-    for i in range(0, len(data['tailposData'])):
+    for i in range(0, len(tailpos_data)):
         receipt_total = 0
+        db_name = tailpos_data[i]['dbName']
+        sync_object = tailpos_data[i]['syncObject']
 
-        # Check if record is existing in deleted documents
-        if deleted_records_check(data['tailposData'][i]['syncObject']['_id'], deleted_records):
+        if deleted_records_check(sync_object['_id'], deleted_records):
             try:
-                exist = frappe.db.sql("SELECT * FROM" + "`tab" + data['tailposData'][i]['dbName'] + "` WHERE name=%s ",
-                                      (data['tailposData'][i]['syncObject']['_id']))
+                query = "SELECT * FROM `tab%(db)s` WHERE name='%(id)s'" % {'db': db_name, 'id': sync_object['_id']}
+                exist = frappe.db.sql(query)
+
             except Exception:
                 print(frappe.get_traceback())
-            if data['tailposData'][i]['dbName'] == "Receipts":
-                # Add receipt lines
-                receipt_total = add_receipt_lines(data['tailposData'], i)
+            if db_name == "Receipts":
+                receipt_total = add_receipt_lines(tailpos_data, i)
 
             if len(exist) > 0:
-
-                frappe_table = frappe.get_doc(data['tailposData'][i]['dbName'],
-                                              data['tailposData'][i]['syncObject']['_id'])
+                frappe_table = frappe.get_doc(db_name, sync_object['_id'])
             else:
-                frappe_table = create_doc(data['tailposData'], i)
-            # Check modified time
+                frappe_table = create_doc(tailpos_data, i)
 
-            update_data = check_modified(data['tailposData'][i]['syncObject']['dateUpdated'], frappe_table)
+            update_data = check_modified(sync_object['dateUpdated'], frappe_table)
 
             if update_data:
-                # Insert data
-                print(data['tailposData'][i]['dbName'])
-                insert_data(i, data['tailposData'], frappe_table, receipt_total)
+                insert_data(i, tailpos_data, frappe_table, receipt_total)
 
     erpnext_data = ""
-    if data['typeOfSync'] == "forceSync":
-        # Fetch all data in ERPNext for selected tables
 
+    if sync_type == "forceSync":
         erpnext_data = force_sync_from_erpnext_to_tailpos()
-
-    elif data['typeOfSync'] == "sync":
-        # Fetch Updated or Added data in ERPNext for selected tables
+    elif sync_type == "sync":
         erpnext_data = sync_from_erpnext_to_tailpos()
+
     return {"data": {"data": erpnext_data, "deleted_documents": deleted_records}}
 
 

@@ -37,3 +37,6 @@
 
 ### v1.3.0 [26 апреля 2019]
 - MAJOR: TailPOS will be using name as naming
+
+### v1.3.1 [29 апреля 2019]
+- Refactored codes
