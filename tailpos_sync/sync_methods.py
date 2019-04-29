@@ -52,59 +52,67 @@ def get_table_select_query(table, force_sync=True):
     return query
 
 
-def insert_data(i, data, frappe_table, receipt_total):
-    for key, value in data[i]['syncObject'].iteritems():
-        print("nisuloddddddd")
+def insert_data(data, frappe_table, receipt_total):
+    sync_object = data['syncObject']
+    db_name = data['dbName']
+
+    for key, value in sync_object.iteritems():
         field_name = str(key).lower()
 
         if field_name == "taxes":
             value = ""
+
         if field_name == "soldby":
             field_name = "stock_uom"
-        if field_name == "colorandshape":
 
+        if field_name == "colorandshape":
             color = json.loads(value)[0]['color'].capitalize()
-            if color == "Darkmagenta":
-                color = "Dark Magenta"
-            if color == "Darkorange":
-                color = "Dark Orange"
-            if color == "Firebrick":
-                color = "Fire Brick"
+            color_fix = {
+                'Darkmagenta': 'Dark Magenta',
+                'Darkorange': 'Dark Orange',
+                'Firebrick': 'Fire Brick'
+            }
+            if color in color_fix.keys():
+                color = color_fix[color]
             frappe_table.db_set("color", color)
             frappe_table.db_set("shape", json.loads(value)[0]['shape'].capitalize())
+
         if field_name == "colororimage":
             field_name = "color_or_image"
+
         if field_name == "imagepath":
             field_name = "image"
+
         if field_name == "price":
             field_name = "standard_rate"
-        if data[i]['dbName'] != "Customer":
+
+        if db_name != "Customer":
             if field_name == "name":
                 field_name = "description"
-        elif data[i]['dbName'] == "Customer":
+
+        elif db_name == "Customer":
             if field_name == "name":
                 field_name = "customer_name"
+
         if field_name == "category":
             category_value = get_category(value)
             value = category_value
+
         if value == "No Category":
             value = ""
+
         if value == "fixDiscount":
             frappe_table.db_set("type", "Fix Discount")
+
         if value == "percentage":
             frappe_table.db_set("type", "Percentage")
 
         if field_name == "date":
-            print(value)
             if value:
-                if data[i]['dbName'] != "Receipts":
+                if db_name != "Receipts":
                     value = datetime.datetime.fromtimestamp(value / 1000.0).date()
-                    print("VALUUUUEEEEEE")
-                    print(value)
                 else:
                     value = datetime.datetime.fromtimestamp(value / 1000.0).date()
-                    print("VALUUUUEEEEEE RECEEEEEEEEEipts")
-                    print(value)
         elif field_name == "shift_beginning" or field_name == "shift_end":
             if value:
                 value = datetime.datetime.fromtimestamp(value / 1000.0)
@@ -112,11 +120,10 @@ def insert_data(i, data, frappe_table, receipt_total):
             value = json.dumps(value)
         try:
             frappe_table.db_set(field_name, value)
-
         except:
             None
     try:
-        if data[i]['dbName'] == "Receipts":
+        if db_name == "Receipts":
             try:
                 frappe_table.db_set("total_amount", receipt_total)
             except Exception:
@@ -212,31 +219,33 @@ def deleted_records_check(id, array):
     return status
 
 
-def create_doc(data, i, owner='Administrator'):
-    if data[i]['dbName'] == "Item":
+def create_doc(data, owner='Administrator'):
+    print("[CREATE_DOC] ============================")
+    print(data['syncObject'])
+    print("[CREATE_DOC] ============================")
+
+    if data['dbName'] == "Item":
         try:
             frappe_table = frappe.get_doc({
-                "doctype": data[i]['dbName'],
-                "id": data[i]['syncObject']['_id'],
-                "item_code": data[i]['syncObject']['name'],
+                "doctype": data['dbName'],
+                "id": data['syncObject']['_id'],
                 "item_group": "All Item Groups",
-                "item_name": data[i]['syncObject']['name'],
+                "item_code": data['syncObject']['name'],
+                "item_name": data['syncObject']['name'],
                 "owner": owner
             })
-
         except Exception:
             print(frappe.get_traceback())
-
     else:
         try:
             frappe_table = frappe.get_doc({
-                "doctype": data[i]['dbName'],
-                "id": data[i]['syncObject']['_id'],
+                "doctype": data['dbName'],
+                "id": data['syncObject']['_id'],
                 "owner": owner
             })
-
         except Exception:
             print(frappe.get_traceback())
+
     return frappe_table
 
 

@@ -64,24 +64,25 @@ def sync_data(data):
         sync_object = tailpos_data[i]['syncObject']
 
         if deleted_records_check(sync_object['_id'], deleted_records):
-            try:
-                query = "SELECT * FROM `tab%(db)s` WHERE name='%(id)s'" % {'db': db_name, 'id': sync_object['_id']}
-                exist = frappe.db.sql(query)
+            query = "SELECT name FROM `tab{0}` WHERE id='{1}'".format(db_name, sync_object['_id'])
 
+            try:
+                exist = frappe.db.sql(query, as_dict=True)
             except Exception:
                 print(frappe.get_traceback())
+
             if db_name == "Receipts":
                 receipt_total = add_receipt_lines(tailpos_data, i)
 
             if len(exist) > 0:
-                frappe_table = frappe.get_doc(db_name, sync_object['_id'])
+                frappe_table = frappe.get_doc(db_name, exist[0]['name'])
             else:
-                frappe_table = create_doc(tailpos_data, i)
+                frappe_table = create_doc(tailpos_data[i])
 
             update_data = check_modified(sync_object['dateUpdated'], frappe_table)
 
             if update_data:
-                insert_data(i, tailpos_data, frappe_table, receipt_total)
+                insert_data(tailpos_data[i], frappe_table, receipt_total)
 
     erpnext_data = ""
 
@@ -95,16 +96,14 @@ def sync_data(data):
 
 def check_modified(data, frappe_table):
     date_from_pos = datetime.datetime.fromtimestamp(data / 1000.0)
-
     if frappe_table.modified == None:
-
         update_data = True
         frappe_table.db_set("date_updated", None)
     else:
         if frappe_table.modified < date_from_pos:
-
             update_data = True
             frappe_table.db_set('date_updated', None)
         else:
             update_data = False
+
     return update_data
