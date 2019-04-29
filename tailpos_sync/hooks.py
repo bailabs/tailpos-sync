@@ -80,9 +80,6 @@ app_license = "MIT"
 # Hook on document methods and events
 
 doc_events = {
-    "User": {
-        "after_insert": "tailpos_sync.events.add_role",
-    },
     "Item": {
         "validate": "tailpos_sync.utils.save_item",
         "before_save": "tailpos_sync.utils.set_item_uuid"

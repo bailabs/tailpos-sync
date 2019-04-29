@@ -40,3 +40,6 @@
 
 ### v1.3.1 [29 апреля 2019]
 - Refactored codes
+
+### v1.3.2 [29 апреля 2019]
+- Removed add_role subscriber
