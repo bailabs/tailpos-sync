@@ -15,17 +15,17 @@ def get_item_query():
 
     columns = [
         'tabItem.id',
-        'tabItem.name',
-        'tabItem.stock_uom',
         'tabItem.sku',
-        'tabItem.barcode',
-        'tabItem.category',
+        'tabItem.name',
         'tabItem.color',
         'tabItem.shape',
-        'tabItem.color_or_image',
         'tabItem.image',
+        'tabItem.barcode',
+        'tabItem.category',
         'tabItem.favorite',
-        '`tabItem Price`.price_list_rate as standard_rate'
+        'tabItem.stock_uom',
+        'tabItem.description',
+        'tabItem.color_or_image',
     ]
 
     standard_rate = 'standard_rate'

@@ -43,3 +43,6 @@
 
 ### v1.3.2 [29 апреля 2019]
 - Removed add_role subscriber
+
+### v1.3.3 [29 апреля 2019]
+- Added description column from Item for syncing
