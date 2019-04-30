@@ -46,3 +46,7 @@
 
 ### v1.3.3 [29 апреля 2019]
 - Added description column from Item for syncing
+
+### v1.3.4 [30 апреля 2019]
+- Add Item field on Receipts Item
+- Sync Item field in Receipts Item

@@ -249,34 +249,39 @@ def create_doc(data, owner='Administrator'):
     return frappe_table
 
 
-def add_receipt_lines(data, i):
+def add_receipt_lines(data):
     receipt_total = 0
-    existLines = frappe.db.sql(
-        "SELECT * FROM `tabReceipts Item` WHERE parent=%s ",
-        (data[i]['syncObject']['_id']))
+    sync_object = data['syncObject']
 
-    if len(existLines) == 0:
-        if len(data[i]['syncObject']['lines']) > 0:
-            for x in range(0, len(data[i]['syncObject']['lines'])):
+    exist_lines = frappe.db.sql("SELECT * FROM `tabReceipts Item` WHERE parent=%s", sync_object['_id'])
 
-                receipt_total += int(data[i]['syncObject']['lines'][x]['price']) * int(
-                    data[i]['syncObject']['lines'][x]['qty'])
+    if len(exist_lines) == 0:
+        if len(sync_object['lines']) > 0:
+            for x in range(0, len(sync_object['lines'])):
+                line = sync_object['lines'][x]
+                price = int(line['price'])
+                qty = int(line['qty'])
+
+                receipt_total += price * qty
 
                 try:
-                    doc = {'doctype': 'Receipts Item',
-                           'parent': data[i]['syncObject']['_id'],
-                           'parenttype': "Receipts",
-                           'parentfield': "receipt_lines",
-                           'item_name': data[i]['syncObject']['lines'][x]['item_name'],
-                           'sold_by': data[i]['syncObject']['lines'][x]['sold_by'],
-                           'price': data[i]['syncObject']['lines'][x]['price'],
-                           'qty': data[i]['syncObject']['lines'][x]['qty']
-                           }
+                    doc = {
+                        'doctype': 'Receipts Item',
+                        'parenttype': 'Receipts',
+                        'parentfield': 'receipt_lines',
+                        'parent': sync_object['_id'],
+                        'item': line['item'],
+                        'item_name': line['item_name'],
+                        'sold_by': line['sold_by'],
+                        'price': line['price'],
+                        'qty': line['qty']
+                    }
                     doc1 = frappe.get_doc(doc)
                     doc1.insert(ignore_permissions=True)
 
                 except Exception:
                     print(frappe.get_traceback())
+
     return receipt_total
 
 

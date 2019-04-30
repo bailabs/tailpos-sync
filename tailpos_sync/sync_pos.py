@@ -72,7 +72,7 @@ def sync_data(data):
                 print(frappe.get_traceback())
 
             if db_name == "Receipts":
-                receipt_total = add_receipt_lines(tailpos_data, i)
+                receipt_total = add_receipt_lines(tailpos_data[i])
 
             if len(exist) > 0:
                 frappe_table = frappe.get_doc(db_name, exist[0]['name'])
