@@ -50,3 +50,6 @@
 ### v1.3.4 [30 апреля 2019]
 - Add Item field on Receipts Item
 - Sync Item field in Receipts Item
+
+### v1.3.5 [2 мая 2019]
+- fix: barcode field missing on Item
