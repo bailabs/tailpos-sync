@@ -120,19 +120,6 @@ def save_item(doc,method):
     if doc.date_updated == None:
         doc.date_updated = doc.modified
 
-# TODO: remove this
-# @frappe.whitelist()
-# def save_customer(doc, method):
-#
-#     try:
-#         doc.customer_group = 'All Customer Group'
-#     except Exception:
-#         print(frappe.get_traceback())
-#     try:
-#         doc.territory = 'All Territories'
-#     except Exception:
-#         print(frappe.get_traceback())
-
 
 def set_item_uuid(doc, method):
     if doc.in_tailpos and not doc.id:
@@ -140,7 +127,7 @@ def set_item_uuid(doc, method):
 
 
 def get_receipt_items(receipt):
-    fields = ['item_name', 'price', 'qty']
+    fields = ['item', 'price', 'qty']
     return frappe.get_all('Receipts Item', filters={'parent': receipt}, fields=fields)
 
 

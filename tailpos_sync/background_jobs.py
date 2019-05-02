@@ -30,7 +30,7 @@ def generate_si_from_receipts():
 
         for item in items:
             si.append('items', {
-                'item_code': item['item_name'],
+                'item_code': item['item'],
                 'rate': item['price'],
                 'qty': item['qty']
             })

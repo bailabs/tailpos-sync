@@ -60,3 +60,7 @@
 ### v1.4.0 [2 мая 2019]
 - fix: total amount on Receipts before_insert
 - refactor: sync functions separated create and update
+
+### v1.4.1 [2 мая 2019]
+- fix: receipts items get item for item code
+- fix: categories id should not be replaced every save
