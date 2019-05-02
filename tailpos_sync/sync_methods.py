@@ -128,8 +128,6 @@ def insert_data(data, frappe_table, receipt_total):
                 frappe_table.db_set("total_amount", receipt_total)
             except Exception:
                 print(frappe.get_traceback())
-        print("EXCEPTION")
-        frappe_table.insert(ignore_permissions=True)
     except Exception:
         print(frappe.get_traceback())
 
@@ -145,7 +143,6 @@ def deleted_documents():
                              as_dict=True)
 
         for x in data:
-
             try:
                 if json.loads(x.data)['id'] != None and x.sync_status == None:
                     returnArray.append({
@@ -219,70 +216,101 @@ def deleted_records_check(id, array):
     return status
 
 
-def create_doc(data, owner='Administrator'):
-    print("[CREATE_DOC] ============================")
-    print(data['syncObject'])
-    print("[CREATE_DOC] ============================")
-
-    if data['dbName'] == "Item":
-        try:
-            frappe_table = frappe.get_doc({
-                "doctype": data['dbName'],
-                "id": data['syncObject']['_id'],
-                "item_group": "All Item Groups",
-                "item_code": data['syncObject']['name'],
-                "item_name": data['syncObject']['name'],
-                "owner": owner
-            })
-        except Exception:
-            print(frappe.get_traceback())
-    else:
-        try:
-            frappe_table = frappe.get_doc({
-                "doctype": data['dbName'],
-                "id": data['syncObject']['_id'],
-                "owner": owner
-            })
-        except Exception:
-            print(frappe.get_traceback())
-
-    return frappe_table
-
-
-def add_receipt_lines(data):
-    receipt_total = 0
+def new_doc(data, owner='Administrator'):
+    db_name = data['dbName']
     sync_object = data['syncObject']
 
-    exist_lines = frappe.db.sql("SELECT * FROM `tabReceipts Item` WHERE parent=%s", sync_object['_id'])
+    doc = {
+        'doctype': db_name,
+        'owner': owner,
+        'id': sync_object['_id'],
+    }
 
-    if len(exist_lines) == 0:
-        if len(sync_object['lines']) > 0:
-            for x in range(0, len(sync_object['lines'])):
-                line = sync_object['lines'][x]
-                price = int(line['price'])
-                qty = int(line['qty'])
+    if db_name == 'Item':
+        doc.update({
+            'item_group': 'All Item Groups',
+            'item_name': sync_object['name'],
+            'item_code': sync_object['name'],
+            'sku': sync_object['sku'],
+            'barcode': sync_object['barcode'],
+            'standard_rate': sync_object['price']
+        })
 
-                receipt_total += price * qty
+    elif db_name == 'Customer':
+        doc.update({
+            'customer_name': sync_object['name']
+        })
 
-                try:
-                    doc = {
-                        'doctype': 'Receipts Item',
-                        'parenttype': 'Receipts',
-                        'parentfield': 'receipt_lines',
-                        'parent': sync_object['_id'],
-                        'item': line['item'],
-                        'item_name': line['item_name'],
-                        'sold_by': line['sold_by'],
-                        'price': line['price'],
-                        'qty': line['qty']
-                    }
-                    doc1 = frappe.get_doc(doc)
-                    doc1.insert(ignore_permissions=True)
+    elif db_name == 'Categories':
+        doc.update({
+            'description': sync_object['name']
+        })
 
-                except Exception:
-                    print(frappe.get_traceback())
+    elif db_name == 'Discounts':
+        doc.update({
+            'description': sync_object['name'],
+            'value': sync_object['value'],
+            'percentagetype': sync_object['percentageType']
+        })
 
-    return receipt_total
+    elif db_name == 'Attendants':
+        doc.update({
+            'user_name': sync_object['user_name'],
+            'pin_code': sync_object['pin_code'],
+            'role': sync_object['role']
+        })
+
+    elif db_name == 'Shifts':
+        doc.update({
+            'attendant': sync_object['attendant'],
+            'beginning_cash': sync_object['beginning_cash'],
+            'ending_cash': sync_object['ending_cash'],
+            'actual_money': sync_object['actual_money'],
+            'shift_end': get_date_fromtimestamp(sync_object['shift_end']),
+            'shift_beginning': get_date_fromtimestamp(sync_object['shift_beginning'])
+        })
+
+    elif db_name == 'Payments':
+        doc.update({
+            'paid': sync_object['paid'],
+            'type': sync_object['type'],
+            'receipt': sync_object['receipt'],
+            'date': get_date_fromtimestamp(sync_object['date'])
+        })
+
+    elif db_name == 'Receipts':
+        doc.update({
+            'status': sync_object['status'].capitalize(),
+            'shift': sync_object['shift'],
+            'customer': sync_object['customer'],
+            'attendant': sync_object['attendant'],
+            'taxesvalue': sync_object['taxesValue'],
+            'discount': sync_object['discount'],
+            'reason': sync_object['reason'],
+            'deviceid': sync_object['deviceId'],
+            'discountvalue': sync_object['discountValue'],
+            'receiptnumber': sync_object['receiptNumber'],
+            'discounttype': sync_object['discountType'].title(),
+            'date': get_date_fromtimestamp(sync_object['date']),
+            'receipt_lines': get_receipt_lines(sync_object['lines']),
+        })
+
+    return frappe.get_doc(doc)
+
+
+def get_receipt_lines(lines):
+    receipt_lines = []
+
+    for line in lines:
+        receipt_lines.append({
+            'item': line['item'],
+            'item_name': line['item_name'],
+            'sold_by': line['sold_by'],
+            'price': line['price'],
+            'qty': line['qty']
+        })
+
+    return receipt_lines
 
 
 def uom_check():
@@ -320,3 +348,7 @@ def get_category(id):
         if data[0]['description']:
             data_value = data[0]['description']
     return data_value
+
+
+def get_date_fromtimestamp(timestamp):
+    return datetime.datetime.fromtimestamp(timestamp / 1000.0).date()

@@ -56,3 +56,7 @@
 
 ### v1.3.6 [2 мая 2019]
 - fix: description to item_name
+
+### v1.4.0 [2 мая 2019]
+- fix: total amount on Receipts before_insert
+- refactor: sync functions separated create and update

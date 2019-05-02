@@ -58,18 +58,19 @@ def sync_data(data):
             except Exception:
                 print(frappe.get_traceback())
 
-            if db_name == "Receipts":
-                receipt_total = add_receipt_lines(tailpos_data[i])
-
             if len(exist) > 0:
                 frappe_table = frappe.get_doc(db_name, exist[0]['name'])
+                update_data = check_modified(sync_object['dateUpdated'], frappe_table)
+
+                if update_data:
+                    insert_data(tailpos_data[i], frappe_table, receipt_total)
             else:
-                frappe_table = create_doc(tailpos_data[i])
+                frappe_table = new_doc(tailpos_data[i])
 
-            update_data = check_modified(sync_object['dateUpdated'], frappe_table)
-
-            if update_data:
-                insert_data(tailpos_data[i], frappe_table, receipt_total)
+                try:
+                    frappe_table.insert(ignore_permissions=True)
+                except:
+                    frappe.log_error(frappe.get_traceback(), 'sync failed')
 
     erpnext_data = ""
 
@@ -83,6 +84,7 @@ def sync_data(data):
 
 def check_modified(data, frappe_table):
     date_from_pos = datetime.datetime.fromtimestamp(data / 1000.0)
+
     if frappe_table.modified == None:
         update_data = True
         frappe_table.db_set("date_updated", None)

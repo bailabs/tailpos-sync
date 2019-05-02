@@ -9,24 +9,33 @@ import uuid
 
 
 class Receipts(Document):
-	def validate(self):
-		if self.date_updated == None:
-
-			try:
-				self.date_updated = self.modified
-			except Exception:
-				print(frappe.get_traceback())
-	def set_default_values(self):
-		"""Set the status as title-d form"""
-		if self.flags.in_insert:
-			self.status = self.status.title()
-			self.series = 'Receipt/{0}'.format(self.receiptnumber)
-
 	def autoname(self):
 		if not self.id:
 			self.id = 'Receipt/' + str(uuid.uuid4())
 		self.name = self.id
 
-	def before_save(self):
+	def validate(self):
+		if self.date_updated == None:
+			try:
+				self.date_updated = self.modified
+			except Exception:
+				print(frappe.get_traceback())
+
+	def set_total_amount(self):
+		self.total_amount = 0
+
+		for line in self.receipt_lines:
+			qty = float(line.qty)
+			price = float(line.price)
+
+			self.total_amount = self.total_amount + (price * qty)
+
+	def set_default_values(self):
+		"""Set the status as title-d form"""
+		self.status = self.status.title()
+		self.series = 'Receipt/{0}'.format(self.receiptnumber)
+		self.set_total_amount()
+
+	def before_insert(self):
 		"""Setup the Receipts document"""
 		self.set_default_values()
