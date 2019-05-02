@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 import frappe
 
-__version__ = '1.3.5'
+__version__ = '1.3.6'
 
 
 @frappe.whitelist()

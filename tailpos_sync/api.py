@@ -12,7 +12,7 @@ def fetch_items():
     if use_price_list:
         items = get_items_with_price_list_rate()
     else:
-        items = frappe.get_all('Item', filters={'in_tailpos': 1}, fields=['name', 'description', 'category', 'standard_rate'])
+        items = frappe.get_all('Item', filters={'in_tailpos': 1}, fields=['name', 'item_name', 'category', 'standard_rate'])
 
     return post_process(items)
 
@@ -27,7 +27,7 @@ def get_items_with_price_list_rate():
     pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
     price_list = frappe.db.get_value('POS Profile', pos_profile, 'selling_price_list')
 
-    items = frappe.db.sql("""SELECT `tabItem`.name, `tabItem`.category, `tabItem`.description, `tabItem Price`.price_list_rate as standard_rate FROM `tabItem` INNER JOIN `tabItem Price` ON `tabItem`.name = `tabItem Price`.item_code WHERE `tabItem`.in_tailpos = 1 AND `tabItem Price`.price_list=%s""", price_list, as_dict=True)
+    items = frappe.db.sql("""SELECT `tabItem`.name, `tabItem`.category, `tabItem`.item_name, `tabItem Price`.price_list_rate as standard_rate FROM `tabItem` INNER JOIN `tabItem Price` ON `tabItem`.name = `tabItem Price`.item_code WHERE `tabItem`.in_tailpos = 1 AND `tabItem Price`.price_list=%s""", price_list, as_dict=True)
 
     return items
 

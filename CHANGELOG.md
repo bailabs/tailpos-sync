@@ -53,3 +53,6 @@
 
 ### v1.3.5 [2 мая 2019]
 - fix: barcode field missing on Item
+
+### v1.3.6 [2 мая 2019]
+- fix: description to item_name
