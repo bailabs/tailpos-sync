@@ -34,19 +34,6 @@ def tailpos_test(data):
 
 
 @frappe.whitelist()
-def pull_data(data):
-    query = "SELECT name FROM `tab{0}`".format(data['doctype'])
-
-    if data['doctype'] == "Item":
-        query = "SELECT name, description, standard_rate FROM `tabItem` WHERE disabled=0"
-
-    # Getting the resources
-    res = frappe.db.sql(query, as_dict=True)
-
-    return {"data": res}
-
-
-@frappe.whitelist()
 def sync_data(data):
     trash_object = data['trashObject']
     tailpos_data = data['tailposData']

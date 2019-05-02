@@ -24,7 +24,7 @@ def get_item_query():
         'tabItem.category',
         'tabItem.favorite',
         'tabItem.stock_uom',
-        'tabItem.description',
+        'tabItem.item_name',
         'tabItem.color_or_image',
     ]
 
