@@ -15,6 +15,7 @@ def generate_si_from_receipts():
     Generates Sales Invoice based from the Receipt created.
     """
     pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
+    submit_invoice = frappe.db.get_single_value('Tail Settings', 'submit_invoice')
     company = frappe.db.get_value('POS Profile', pos_profile, 'company')
     receipts = frappe.get_all('Receipts', filters={'generated': 0})
 
@@ -38,9 +39,15 @@ def generate_si_from_receipts():
         si.set_missing_values()
         si.insert()
 
-        si.payments[0].amount = si.outstanding_amount
-        si.submit()
+        if submit_invoice:
+            try:
+                si.payments[0].amount = si.outstanding_amount
+                si.submit()
+            except:
+                frappe.log_error(frappe.get_traceback(), 'generate sales invoice failed')
 
         # ticked `Generated Sales Invoice`
         frappe.db.set_value('Receipts', receipt.name, 'generated', 1)
+        frappe.db.set_value('Receipts', receipt.name, 'reference_invoice', si.name)
         frappe.db.commit()
+
