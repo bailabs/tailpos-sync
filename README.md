@@ -2,6 +2,6 @@
 
 TailPOS ERPNext Sync
 
-#### License
 
+#### License
 MIT
