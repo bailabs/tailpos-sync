@@ -36,18 +36,27 @@ def generate_si_from_receipts():
                 'qty': item['qty']
             })
 
-        si.set_missing_values()
-        si.insert()
-
-        if submit_invoice:
-            try:
-                si.payments[0].amount = si.outstanding_amount
-                si.submit()
-            except:
-                frappe.log_error(frappe.get_traceback(), 'generate sales invoice failed')
+        insert_invoice(si, submit_invoice)
 
         # ticked `Generated Sales Invoice`
         frappe.db.set_value('Receipts', receipt.name, 'generated', 1)
         frappe.db.set_value('Receipts', receipt.name, 'reference_invoice', si.name)
         frappe.db.commit()
 
+
+# Helper
+def insert_invoice(invoice, submit=False):
+    invoice.set_missing_values()
+    invoice.insert()
+
+    invoice.payments[0].amount = invoice.outstanding_amount
+    invoice.save()
+
+    if submit and not check_items_zero_qty(invoice.items):
+        invoice.submit()
+
+
+def check_items_zero_qty(items):
+    for item in items:
+        if item.actual_qty <= 0:
+            return True
