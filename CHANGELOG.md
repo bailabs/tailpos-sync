@@ -68,3 +68,6 @@
 ### v1.4.2 [6 мая 2019]
 - feat: submit sales invoice
 - feat: Sales Invoice field on Receipts (know what Sales Invoice generated)
+
+### v1.4.3 [7 мая 2019]
+- refactor: removed unused functions

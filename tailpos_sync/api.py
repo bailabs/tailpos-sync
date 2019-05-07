@@ -6,7 +6,6 @@ import frappe
 
 @frappe.whitelist(allow_guest=True)
 def fetch_items():
-    items = []
     use_price_list = frappe.db.get_single_value('Tail Settings', 'use_price_list')
 
     if use_price_list:
