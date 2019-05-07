@@ -72,3 +72,4 @@
 ### v1.4.3 [7 мая 2019]
 - refactor: removed unused functions
 - refactor(ui): modified Attendants layout
+- feat: added POS Profile in Device document
