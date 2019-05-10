@@ -77,3 +77,4 @@
 ### v1.4.4 [10 мая 2019]
 - refactor: sync methods
 - feat: Device ID in syncing items
+- feat: device id in TailOrder

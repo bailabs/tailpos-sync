@@ -2,14 +2,25 @@
 # Functions used by TailOrder
 # ---
 import frappe
+import json
 
 
 @frappe.whitelist(allow_guest=True)
 def fetch_items():
+    try:
+        data = json.loads(frappe.request.data)
+    except:
+        data = None
+
+    pos_profile = None
+
+    if data:
+        pos_profile = frappe.db.get_value('Device', data['device'], 'pos_profile')
+
     use_price_list = frappe.db.get_single_value('Tail Settings', 'use_price_list')
 
     if use_price_list:
-        items = get_items_with_price_list_rate()
+        items = get_items_with_price_list_rate(pos_profile)
     else:
         items = frappe.get_all('Item', filters={'in_tailpos': 1}, fields=['name', 'item_name', 'category', 'standard_rate'])
 
@@ -22,8 +33,10 @@ def fetch_categories():
     return categories
 
 
-def get_items_with_price_list_rate():
-    pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
+def get_items_with_price_list_rate(pos_profile=None):
+    if not pos_profile:
+        pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
+
     price_list = frappe.db.get_value('POS Profile', pos_profile, 'selling_price_list')
 
     items = frappe.db.sql("""SELECT `tabItem`.name, `tabItem`.category, `tabItem`.item_name, `tabItem Price`.price_list_rate as standard_rate FROM `tabItem` INNER JOIN `tabItem Price` ON `tabItem`.name = `tabItem Price`.item_code WHERE `tabItem`.in_tailpos = 1 AND `tabItem Price`.price_list=%s""", price_list, as_dict=True)
