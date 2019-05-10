@@ -10,7 +10,7 @@ def get_tables_for_sync():
     return ['Item', 'Customer', 'Categories', 'Discounts', 'Attendants']
 
 
-def get_item_query():
+def get_item_query(pos_profile):
     use_price_list = frappe.db.get_single_value('Tail Settings', 'use_price_list')
 
     columns = [
@@ -35,7 +35,7 @@ def get_item_query():
 
     columns.append(standard_rate)
 
-    return get_items_with_price_list_query(columns)
+    return get_items_with_price_list_query(columns, pos_profile)
 
 
 def get_table_select_query(table, force_sync=True, pos_profile=None):
@@ -43,7 +43,7 @@ def get_table_select_query(table, force_sync=True, pos_profile=None):
     query = "SELECT * FROM `tab{0}`".format(table)
 
     if table == 'Item':
-        query = get_item_query()
+        query = get_item_query(pos_profile)
 
     if not force_sync:
         connector = " AND " if "WHERE" in query else " WHERE "
