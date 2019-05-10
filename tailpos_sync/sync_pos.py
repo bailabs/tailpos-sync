@@ -38,14 +38,15 @@ def sync_data(data):
     trash_object = data['trashObject']
     tailpos_data = data['tailposData']
     sync_type = data['typeOfSync']
+    device_id = data['deviceId']
 
     uom_check()
     deleted_records = deleted_documents()
-
-    # Delete records
     delete_records(trash_object)
 
-    for i in range(0, len(tailpos_data)):
+    data_length = len(tailpos_data)
+
+    for i in range(0, data_length):
         receipt_total = 0
         db_name = tailpos_data[i]['dbName']
         sync_object = tailpos_data[i]['syncObject']
@@ -72,14 +73,18 @@ def sync_data(data):
                 except:
                     frappe.log_error(frappe.get_traceback(), 'sync failed')
 
-    erpnext_data = ""
+    force_sync = True if sync_type == "forceSync" else False
+    erpnext_data = sync_from_erpnext(device_id, force_sync)
 
-    if sync_type == "forceSync":
-        erpnext_data = force_sync_from_erpnext_to_tailpos()
-    elif sync_type == "sync":
-        erpnext_data = sync_from_erpnext_to_tailpos()
+    if not erpnext_data:
+        erpnext_data = ""
 
-    return {"data": {"data": erpnext_data, "deleted_documents": deleted_records}}
+    res = {
+        "data": erpnext_data,
+        "deleted_documents": deleted_records
+    }
+
+    return {"data": res}
 
 
 def check_modified(data, frappe_table):

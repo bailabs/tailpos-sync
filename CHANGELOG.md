@@ -73,3 +73,6 @@
 - refactor: removed unused functions
 - refactor(ui): modified Attendants layout
 - feat: added POS Profile in Device document
+
+### v1.4.4 [10 мая 2019]
+- refactor: sync methods

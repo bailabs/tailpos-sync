@@ -131,8 +131,10 @@ def get_receipt_items(receipt):
     return frappe.get_all('Receipts Item', filters={'parent': receipt}, fields=fields)
 
 
-def get_items_with_price_list_query(columns=None):
-    pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
+def get_items_with_price_list_query(columns=None, pos_profile=None):
+    if not pos_profile:
+        pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
+
     price_list = frappe.db.get_value('POS Profile', pos_profile, 'selling_price_list')
 
     columns_str = ', '.join(columns) if columns else '*'

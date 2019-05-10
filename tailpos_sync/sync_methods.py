@@ -38,7 +38,7 @@ def get_item_query():
     return get_items_with_price_list_query(columns)
 
 
-def get_table_select_query(table, force_sync=True):
+def get_table_select_query(table, force_sync=True, pos_profile=None):
 
     query = "SELECT * FROM `tab{0}`".format(table)
 
@@ -160,42 +160,73 @@ def deleted_documents():
     return returnArray
 
 
-def force_sync_from_erpnext_to_tailpos():
-    # Fetch all data in ERPNext for selected tables
+def sync_from_erpnext(device=None, force_sync=True):
     data = []
     tables = get_tables_for_sync()
 
-    try:
-        for table in tables:
-            query = get_table_select_query(table)
-            query_data = frappe.db.sql(query, as_dict=True)
+    if device:
+        pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
 
-            for row in query_data:
-                data.append({
-                    'tableNames': table,
-                    'syncObject': row
-                })
-                frappe.db.sql("UPDATE `tab" + table + "` SET `date_updated`=`modified` where id=%s", row.id)
-    except Exception:
-        print(frappe.get_traceback())
+    for table in tables:
+        query = get_table_select_query(table, force_sync, pos_profile=pos_profile)
+        query_data = frappe.db.sql(query, as_dict=True)
+        sync_data = update_sync_data(query_data, table)
+
+        if sync_data:
+            data.extend(sync_data)
+
     return data
 
 
-def sync_from_erpnext_to_tailpos():
-    # Fetch Updated or Added data in ERPNext for selected tables
+# DEPRECATED
+def force_sync_from_erpnext_to_tailpos(device=None):
+    """
+    Fetches all data in ERPNext.
+
+    :param device:
+    :return data:
+    """
     data = []
     tables = get_tables_for_sync()
 
-    for table in tables:
-        query_data = frappe.db.sql(get_table_select_query(table, False), as_dict=True)
+    if device:
+        pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
 
+    try:
+        for table in tables:
+            query = get_table_select_query(table, pos_profile=pos_profile)
+            query_data = frappe.db.sql(query, as_dict=True)
+            sync_data = update_sync_data(query_data, table)
+            data.extend(sync_data)
+    except Exception:
+        print(frappe.get_traceback())
+
+    return data
+
+
+# DEPRECATED
+def sync_from_erpnext_to_tailpos(device=None):
+    """
+    Fetch added/updated data in ERPNext.
+
+    :param device: name of the Device doctype
+    :return data: sync data
+    """
+    data = []
+    tables = get_tables_for_sync()
+
+    if device:
+        pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
+
+    for table in tables:
+        query = get_table_select_query(table, False, pos_profile=pos_profile)
+        query_data = frappe.db.sql(query, as_dict=True)
+
+        # Kung naay sulod
         if len(query_data) > 0:
-            for x in query_data:
-                data.append({
-                    'tableNames': table,
-                    'syncObject': x
-                })
-                frappe.db.sql("UPDATE `tab" + table + "` SET `date_updated`=`modified` where id=%s", x.id)
+            sync_data = update_sync_data(query_data, table)
+            data.extend(sync_data)
+
     return data
 
 
@@ -352,3 +383,16 @@ def get_category(id):
 
 def get_date_fromtimestamp(timestamp):
     return datetime.datetime.fromtimestamp(timestamp / 1000.0).date()
+
+
+def update_sync_data(data, table):
+    res = []
+
+    for datum in data:
+        res.append({
+            'tableNames': table,
+            'syncObject': datum
+        })
+        frappe.db.sql("UPDATE `tab" + table + "` SET `date_updated`=`modified` where id=%s", datum.id)
+
+    return res
