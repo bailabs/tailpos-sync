@@ -78,3 +78,6 @@
 - refactor: sync methods
 - feat: Device ID in syncing items
 - feat: device id in TailOrder
+
+### v1.4.5 [14 мая 2019]
+- feat: added Use Device Profile field under Tail Settings
