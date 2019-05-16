@@ -22,10 +22,18 @@ def generate_si_from_receipts():
     receipts = frappe.get_all('Receipts', filters={'generated': 0})
 
     for receipt in receipts:
+        mop = 'Cash'
+
         if use_device_profile:
             device = frappe.db.get_value('Receipts', receipt.name, 'deviceid')
-            pos_profile = get_device_pos_profile(device)
+            pos_profile = _get_device_pos_profile(device)
             company = frappe.db.get_value('POS Profile', pos_profile, 'company')
+
+        type = _get_receipts_payment_type(receipt.name)
+        items = get_receipt_items(receipt.name)
+
+        if type:
+            mop = _get_mode_of_payment(type[0])
 
         si = frappe.get_doc({
             'doctype': 'Sales Invoice',
@@ -34,8 +42,6 @@ def generate_si_from_receipts():
             'company': company
         })
 
-        items = get_receipt_items(receipt.name)
-
         for item in items:
             si.append('items', {
                 'item_code': item['item'],
@@ -43,7 +49,7 @@ def generate_si_from_receipts():
                 'qty': item['qty']
             })
 
-        insert_invoice(si, submit_invoice)
+        _insert_invoice(si, mop, submit_invoice)
 
         # ticked `Generated Sales Invoice`
         frappe.db.set_value('Receipts', receipt.name, 'generated', 1)
@@ -52,25 +58,40 @@ def generate_si_from_receipts():
 
 
 # Helper
-def insert_invoice(invoice, submit=False):
+def _insert_invoice(invoice, mop, submit=False):
     invoice.set_missing_values()
     invoice.insert()
 
     invoice.append('payments', {
-        'mode_of_payment': 'Cash',
+        'mode_of_payment': mop,
         'amount': invoice.outstanding_amount
     })
     invoice.save()
 
-    if submit and not check_items_zero_qty(invoice.items):
+    if submit and not _check_items_zero_qty(invoice.items):
         invoice.submit()
 
 
-def check_items_zero_qty(items):
+def _check_items_zero_qty(items):
     for item in items:
         if item.actual_qty <= 0:
             return True
 
 
-def get_device_pos_profile(device):
+def _get_device_pos_profile(device):
     return frappe.db.get_value('Device', device, 'pos_profile')
+
+
+def _get_receipts_payment_type(receipt):
+    return frappe.db.sql_list("""SELECT type FROM `tabPayments` WHERE receipt=%s""", receipt)
+
+
+def _get_mode_of_payment(type):
+    mode_of_payment = None
+
+    if type == 'Cash':
+        mode_of_payment = frappe.db.get_single_value('Tail Settings', 'cash_mop')
+    elif type == 'Card':
+        mode_of_payment = frappe.db.get_single_value('Tail Settings', 'card_mop')
+
+    return mode_of_payment

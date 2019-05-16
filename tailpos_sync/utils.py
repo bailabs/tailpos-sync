@@ -116,8 +116,8 @@ def exists_sales_invoice_by_receipt(receipt):
 
 
 @frappe.whitelist()
-def save_item(doc,method):
-    if doc.date_updated == None:
+def save_item(doc, method):
+    if doc.date_updated is None:
         doc.date_updated = doc.modified
 
 

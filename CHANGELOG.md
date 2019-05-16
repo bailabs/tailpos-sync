@@ -81,3 +81,6 @@
 
 ### v1.4.5 [14 мая 2019]
 - feat: added Use Device Profile field under Tail Settings
+
+### v1.5.0 [16 мая 2019]
+- feat: added Mode of Payment settings under Tail Settings
