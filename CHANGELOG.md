@@ -87,3 +87,6 @@
 
 ### v1.5.1 [19 мая 2019]
 - feat: added Mode of Payment settings under Device doctype
+
+### v1.5.2 [19 мая 2019]
+- refactor: item hooks from utils to doc_events

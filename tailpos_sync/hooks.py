@@ -81,8 +81,8 @@ app_license = "MIT"
 
 doc_events = {
     "Item": {
-        "validate": "tailpos_sync.utils.save_item",
-        "before_save": "tailpos_sync.utils.set_item_uuid"
+        "validate": "tailpos_sync.doc_events.item.validate",
+        "before_save": "tailpos_sync.doc_events.item.before_save"
     },
 }
 

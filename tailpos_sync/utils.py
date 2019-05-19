@@ -115,17 +115,6 @@ def exists_sales_invoice_by_receipt(receipt):
     return False
 
 
-@frappe.whitelist()
-def save_item(doc, method):
-    if doc.date_updated is None:
-        doc.date_updated = doc.modified
-
-
-def set_item_uuid(doc, method):
-    if doc.in_tailpos and not doc.id:
-        doc.id = str(uuid.uuid4())
-
-
 def get_receipt_items(receipt):
     fields = ['item', 'price', 'qty']
     return frappe.get_all('Receipts Item', filters={'parent': receipt}, fields=fields)
@@ -142,3 +131,9 @@ def get_items_with_price_list_query(columns=None, pos_profile=None):
     query = """SELECT %s FROM `tabItem` INNER JOIN `tabItem Price` ON `tabItem`.name = `tabItem Price`.item_code WHERE `tabItem`.in_tailpos = 1 AND `tabItem Price`.price_list='%s'""" % (columns_str, price_list)
 
     return query
+
+# Where is this called?
+@frappe.whitelist()
+def save_item(doc, method):
+    if doc.date_updated is None:
+        doc.date_updated = doc.modified
