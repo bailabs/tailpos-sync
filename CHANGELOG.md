@@ -84,3 +84,6 @@
 
 ### v1.5.0 [16 мая 2019]
 - feat: added Mode of Payment settings under Tail Settings
+
+### v1.5.1 [19 мая 2019]
+- feat: added Mode of Payment settings under Device doctype
