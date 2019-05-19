@@ -2,6 +2,7 @@ import frappe
 import uuid
 
 
+# DEPRECATED
 def generate_sales_invoice_daily():
     """Generate Sales Invoice from Receipts"""
 
@@ -13,6 +14,7 @@ def generate_sales_invoice_daily():
         generate_sales_invoice_by_date(date.daily_date)
 
 
+# DEPRECATED
 def receipts_by_date(date):
     """Retrieve Receipts by date"""
 
@@ -23,6 +25,7 @@ def receipts_by_date(date):
     return receipts
 
 
+# DEPRECATED
 def generate_sales_invoice_lines(name):
     """Create Sales Invoice from Receipts"""
     receipt = frappe.get_doc('Receipts', name)
@@ -41,6 +44,7 @@ def generate_sales_invoice_lines(name):
     return lines
 
 
+# DEPRECATED
 def generate_sales_invoice_by_date(date):
     """Create Sales Invoice"""
 
@@ -85,6 +89,7 @@ def generate_sales_invoice_by_date(date):
         print str(e)
 
 
+# DEPRECATED
 def sync_now():
     """Generates Sales Invoice Daily"""
     from frappe.utils.background_jobs import enqueue
@@ -95,6 +100,7 @@ def sync_now():
         enqueue('tailpos_sync.tailpos.generate_sales_invoice_today', timeout=2000, queue='long')
 
 
+# DEPRECATED
 def shifts_by_date(date):
     """Retrieve Shifts by date"""
 
@@ -107,6 +113,7 @@ def shifts_by_date(date):
     return shifts
 
 
+# DEPRECATED
 def exists_sales_invoice_by_receipt(receipt):
     """Is there an existing Sales Invoice"""
     sales_invoices = frappe.get_all('Sales Invoice', filters={'remarks': receipt})

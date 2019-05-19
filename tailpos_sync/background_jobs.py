@@ -22,6 +22,7 @@ def generate_si_from_receipts():
     receipts = frappe.get_all('Receipts', filters={'generated': 0})
 
     for receipt in receipts:
+        device = None
         mop = 'Cash'
 
         if use_device_profile:
@@ -33,7 +34,7 @@ def generate_si_from_receipts():
         items = get_receipt_items(receipt.name)
 
         if type:
-            mop = _get_mode_of_payment(type[0])
+            mop = _get_mode_of_payment(type[0], device=device)
 
         si = frappe.get_doc({
             'doctype': 'Sales Invoice',
@@ -86,8 +87,11 @@ def _get_receipts_payment_type(receipt):
     return frappe.db.sql_list("""SELECT type FROM `tabPayments` WHERE receipt=%s""", receipt)
 
 
-def _get_mode_of_payment(type):
+def _get_mode_of_payment(type, device=None):
     mode_of_payment = None
+
+    if device:
+        return _get_device_mode_of_payment(device, type)
 
     if type == 'Cash':
         mode_of_payment = frappe.db.get_single_value('Tail Settings', 'cash_mop')
@@ -95,3 +99,11 @@ def _get_mode_of_payment(type):
         mode_of_payment = frappe.db.get_single_value('Tail Settings', 'card_mop')
 
     return mode_of_payment
+
+
+def _get_device_mode_of_payment(device, type):
+    if type == 'Cash':
+        return frappe.db.get_value('Device', device, 'cash_mop')
+    elif type == 'Card':
+        return frappe.db.get_value('Device', device, 'card_mop')
+    return None
