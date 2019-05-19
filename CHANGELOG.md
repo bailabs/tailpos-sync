@@ -90,3 +90,4 @@
 
 ### v1.5.2 [19 мая 2019]
 - refactor: item hooks from utils to doc_events
+- added: functions device mode of payment
