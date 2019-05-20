@@ -29,8 +29,12 @@ def fetch_items():
 
 @frappe.whitelist(allow_guest=True)
 def fetch_categories():
-    categories = frappe.get_all('Categories', fields=['name'])
-    return categories
+    return frappe.get_all('Categories', fields=['name'])
+
+
+@frappe.whitelist(allow_guest=True)
+def fetch_remarks():
+    return frappe.get_all('Remarks Template', fields=['name'])
 
 
 def get_items_with_price_list_rate(pos_profile=None):
