@@ -95,3 +95,4 @@
 ### v1.6.0 [20 мая 2019]
 - added: doctype Remarks Template
 - remove: unnecessary functions in Categories
+- refactor: get_all to get_items_with_standard_rate
