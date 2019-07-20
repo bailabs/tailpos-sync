@@ -90,6 +90,9 @@ doc_events = {
 # ---------------
 
 scheduler_events = {
+    "hourly": [
+        "tailpos_sync.background_jobs.generate_si"
+    ]
     # "* * * * *": [
     #     "tailpos_erpnext.tasks.sync_couchdb"
     # ],
