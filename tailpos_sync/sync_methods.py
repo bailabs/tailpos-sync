@@ -166,14 +166,17 @@ def sync_from_erpnext(device=None, force_sync=True):
 
     if device:
         pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
+    default_company = get_default_company()
 
+    data.extend(default_company)
     for table in tables:
-        query = get_table_select_query(table, force_sync, pos_profile=pos_profile)
-        query_data = frappe.db.sql(query, as_dict=True)
-        sync_data = update_sync_data(query_data, table)
+        if table != "Company":
+            query = get_table_select_query(table, force_sync, pos_profile=pos_profile)
+            query_data = frappe.db.sql(query, as_dict=True)
+            sync_data = update_sync_data(query_data, table)
 
-        if sync_data:
-            data.extend(sync_data)
+            if sync_data:
+                data.extend(sync_data)
 
     return data
 
@@ -395,4 +398,13 @@ def update_sync_data(data, table):
         })
         frappe.db.sql("UPDATE `tab" + table + "` SET `date_updated`=`modified` where id=%s", datum.id)
 
+    return res
+
+def get_default_company():
+    default_company = frappe.get_single('Tail Settings')
+    res = []
+    res.append({
+        'tableNames': "Company",
+        'syncObject': default_company
+    })
     return res

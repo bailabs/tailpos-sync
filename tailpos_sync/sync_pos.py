@@ -51,27 +51,31 @@ def sync_data(data):
         db_name = tailpos_data[i]['dbName']
         sync_object = tailpos_data[i]['syncObject']
 
-        if deleted_records_check(sync_object['_id'], deleted_records):
-            query = "SELECT name FROM `tab{0}` WHERE id='{1}'".format(db_name, sync_object['_id'])
-
-            try:
-                exist = frappe.db.sql(query, as_dict=True)
-            except Exception:
-                print(frappe.get_traceback())
-
-            if len(exist) > 0:
-                frappe_table = frappe.get_doc(db_name, exist[0]['name'])
-                update_data = check_modified(sync_object['dateUpdated'], frappe_table)
-
-                if update_data:
-                    insert_data(tailpos_data[i], frappe_table, receipt_total)
-            else:
-                frappe_table = new_doc(tailpos_data[i])
+        if tailpos_data[i]['dbName'] != "Company":
+            if deleted_records_check(sync_object['_id'], deleted_records):
+                query = "SELECT name FROM `tab{0}` WHERE id='{1}'".format(db_name, sync_object['_id'])
 
                 try:
-                    frappe_table.insert(ignore_permissions=True)
-                except:
-                    frappe.log_error(frappe.get_traceback(), 'sync failed')
+                    exist = frappe.db.sql(query, as_dict=True)
+                except Exception:
+                    print(frappe.get_traceback())
+
+                if len(exist) > 0:
+                    frappe_table = frappe.get_doc(db_name, exist[0]['name'])
+
+                    if 'dateUpdated' in sync_object:
+                        update_data = check_modified(sync_object['dateUpdated'], frappe_table)
+                    else:
+                        update_data = True
+                    if update_data:
+                        insert_data(tailpos_data[i], frappe_table, receipt_total)
+                else:
+                    frappe_table = new_doc(tailpos_data[i])
+
+                    try:
+                        frappe_table.insert(ignore_permissions=True)
+                    except:
+                        frappe.log_error(frappe.get_traceback(), 'sync failed')
 
     force_sync = True if sync_type == "forceSync" else False
     erpnext_data = sync_from_erpnext(device_id, force_sync)
