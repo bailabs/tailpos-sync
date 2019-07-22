@@ -47,8 +47,12 @@ def get_table_select_query(table, force_sync=True, pos_profile=None):
 
     if not force_sync:
         connector = " AND " if "WHERE" in query else " WHERE "
-        query = query + connector + "`modified` > `date_updated`"
-
+        if table == "Item":
+            query = query + connector + "`tabItem`.modified > `tabItem`.date_updated" \
+                                        ""
+        else:
+            query = query + connector + "`modified` > `date_updated`"
+    print(query)
     return query
 
 
@@ -167,16 +171,15 @@ def sync_from_erpnext(device=None, force_sync=True):
     if device:
         pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
     default_company = get_default_company()
-
     data.extend(default_company)
-    for table in tables:
-        if table != "Company":
-            query = get_table_select_query(table, force_sync, pos_profile=pos_profile)
-            query_data = frappe.db.sql(query, as_dict=True)
-            sync_data = update_sync_data(query_data, table)
 
-            if sync_data:
-                data.extend(sync_data)
+    for table in tables:
+        query = get_table_select_query(table, force_sync, pos_profile=pos_profile)
+        query_data = frappe.db.sql(query, as_dict=True)
+        sync_data = update_sync_data(query_data, table)
+
+        if sync_data:
+            data.extend(sync_data)
 
     return data
 
@@ -187,7 +190,7 @@ def force_sync_from_erpnext_to_tailpos(device=None):
     Fetches all data in ERPNext.
 
     :param device:
-    :return data:
+    :retdilurn data:
     """
     data = []
     tables = get_tables_for_sync()

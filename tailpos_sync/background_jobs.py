@@ -18,13 +18,15 @@ def generate_si_from_receipts():
     submit_invoice = frappe.db.get_single_value('Tail Settings', 'submit_invoice')
     use_device_profile = frappe.db.get_single_value('Tail Settings', 'use_device_profile')
     generate_limit = frappe.db.get_single_value('Tail Settings', 'generate_limit')
+    print("GENERAAAATE LIMIIIIT")
+    print(generate_limit)
     company = frappe.db.get_value('POS Profile', pos_profile, 'company')
 
     receipts = frappe.db.sql("""
         SELECT name FROM `tabReceipts`
         WHERE generated = 0
         LIMIT %(limit)s
-    """, {'limit': generate_limit}, as_dict=True)
+    """, {'limit': int(generate_limit)}, as_dict=True)
     # receipts = frappe.get_all('Receipts', filters={'generated': 0})
 
     for receipt in receipts:
