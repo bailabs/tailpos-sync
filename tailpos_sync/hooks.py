@@ -7,7 +7,7 @@ app_title = "TailPOS Sync"
 app_publisher = "Bai Web and Mobile Lab"
 app_description = "TailPOS ERPNext Sync"
 app_icon = "octicon octicon-file-directory"
-app_color = "grey"
+app_color = "#3498db"
 app_email = "hello@bai.ph"
 app_license = "MIT"
 
