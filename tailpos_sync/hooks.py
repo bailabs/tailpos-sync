@@ -11,6 +11,31 @@ app_color = "grey"
 app_email = "hello@bai.ph"
 app_license = "MIT"
 
+fixtures = [
+    {
+        "doctype": "Custom Field",
+        "filters": [
+            [
+                "name",
+                "in",
+                [
+                    "Item-barcode",
+                    "Item-in_tailpos",
+                    "Customer-note",
+                    "Customer-phonenumber",
+                    "Customer-email",
+                    "Customer-id",
+                    "Customer-date_updated",
+                    "Deleted Document-sync_status",
+                    "Item-date_updated",
+                    "Item-id",
+                    "Item-favorite"
+                ]
+            ]
+        ]
+    }
+]
+
 # Includes in <head>
 # ------------------
 
@@ -124,7 +149,3 @@ scheduler_events = {
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "tailpos_erpnext.event.get_events"
 # }
-
-fixtures = [
-    {"dt": "Custom Field", "filters": [["dt", "in", ("Item", "Customer", "Deleted Document")]]},
-]
