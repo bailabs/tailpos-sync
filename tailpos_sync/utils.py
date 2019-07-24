@@ -131,13 +131,23 @@ def get_items_with_price_list_query(columns=None, pos_profile=None):
     if not pos_profile:
         pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
 
-    price_list = frappe.db.get_value('POS Profile', pos_profile, 'selling_price_list')
+    price_list = _get_price_list(pos_profile)
 
     columns_str = ', '.join(columns) if columns else '*'
 
     query = """SELECT %s FROM `tabItem` INNER JOIN `tabItem Price` ON `tabItem`.name = `tabItem Price`.item_code WHERE `tabItem`.in_tailpos = 1 AND `tabItem Price`.price_list='%s'""" % (columns_str, price_list)
 
     return query
+
+
+def _get_price_list(pos_profile):
+    price_list = frappe.db.get_value('POS Profile', pos_profile, 'selling_price_list')
+
+    if not price_list:
+        price_list = 'Standard Selling'
+
+    return price_list
+
 
 # Where is this called?
 @frappe.whitelist()

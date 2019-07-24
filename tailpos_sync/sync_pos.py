@@ -77,7 +77,7 @@ def sync_data(data):
                     except:
                         frappe.log_error(frappe.get_traceback(), 'sync failed')
 
-    force_sync = True if sync_type == "forceSync" else False
+    force_sync = (sync_type == "forceSync")
     erpnext_data = sync_from_erpnext(device_id, force_sync)
 
     if not erpnext_data:

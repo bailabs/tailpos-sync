@@ -39,7 +39,6 @@ def get_item_query(pos_profile):
 
 
 def get_table_select_query(table, force_sync=True, pos_profile=None):
-
     query = "SELECT * FROM `tab{0}`".format(table)
 
     if table == 'Item':
@@ -52,7 +51,7 @@ def get_table_select_query(table, force_sync=True, pos_profile=None):
                                         ""
         else:
             query = query + connector + "`modified` > `date_updated`"
-    print(query)
+
     return query
 
 
@@ -167,9 +166,8 @@ def deleted_documents():
 def sync_from_erpnext(device=None, force_sync=True):
     data = []
     tables = get_tables_for_sync()
+    pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
 
-    if device:
-        pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
     default_company = get_default_company()
     data.extend(default_company)
 
