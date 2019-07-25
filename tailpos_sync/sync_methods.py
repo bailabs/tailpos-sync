@@ -267,12 +267,11 @@ def delete_records(data):
             frappe.db.sql("DELETE FROM" + "`tab" + table_name + "` WHERE id=%s", trash_id)
 
 
-def deleted_records_check(id, array):
-    status = True
-    for i in array:
-        if i['_id'] == id:
-            status = False
-    return status
+def is_deleted_record(_id, deleted_records):
+    for deleted_record in deleted_records:
+        if deleted_record('_id') == _id:
+            return True
+    return False
 
 
 def new_doc(data, owner='Administrator'):

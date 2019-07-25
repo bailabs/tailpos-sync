@@ -86,27 +86,28 @@ def _sync_to_erpnext(tailpos_data, deleted_records):
         _id = sync_object.get('_id')
         date_updated = sync_object.get('dateUpdated')
 
-        if db_name != "Company":
-            if deleted_records_check(_id, deleted_records):
-                query = "SELECT name FROM `tab{0}` WHERE id='{1}'".format(db_name, _id)
+        if db_name == "Company" or is_deleted_record(_id, deleted_records):
+            continue
 
-                try:
-                    exist = frappe.db.sql(query, as_dict=True)
-                except Exception:
-                    print(frappe.get_traceback())
+        exist = frappe.db.sql(
+            "SELECT name FROM `tab{0}` WHERE id=%(_id)s".format(db_name),
+            {'_id': _id},
+            as_dict=True
+        )
 
-                if len(exist) > 0:
-                    frappe_table = frappe.get_doc(db_name, exist[0]['name'])
+        if exist:
+            frappe_table = frappe.get_doc(db_name, exist[0]['name'])
 
-                    if 'dateUpdated' in sync_object:
-                        update_data = check_modified(date_updated, frappe_table)
-                    else:
-                        update_data = True
-                    if update_data:
-                        insert_data(row, frappe_table, receipt_total)
-                else:
-                    frappe_table = new_doc(row)
-                    try:
-                        frappe_table.insert(ignore_permissions=True)
-                    except:
-                        frappe.log_error(frappe.get_traceback(), 'sync failed')
+            if 'dateUpdated' in sync_object:
+                update_data = check_modified(date_updated, frappe_table)
+            else:
+                update_data = True
+            if update_data:
+                insert_data(row, frappe_table, receipt_total)
+        else:
+            frappe_table = new_doc(row)
+
+            try:
+                frappe_table.insert(ignore_permissions=True)
+            except:
+                frappe.log_error(frappe.get_traceback(), 'sync failed')
