@@ -258,11 +258,13 @@ def sync_from_erpnext_to_tailpos(device=None):
 
 def delete_records(data):
     for check in data:
-        check_existing_deleted_item = frappe.db.sql("SELECT * FROM" + "`tab" + check['table_name'] + "` WHERE id=%s ",
-                                                    (check['trashId']))
-        if len(check_existing_deleted_item) > 0:
-            frappe.db.sql("DELETE FROM" + "`tab" + check['table_name'] + "` WHERE id=%s ",
-                          (check['trashId']))
+        table_name = check.get('table_name')
+        trash_id = check.get('trashId')
+
+        records = frappe.get_all(table_name, filters={'id': trash_id}, fields=['name'])
+
+        if records:
+            frappe.db.sql("DELETE FROM" + "`tab" + table_name + "` WHERE id=%s", trash_id)
 
 
 def deleted_records_check(id, array):
