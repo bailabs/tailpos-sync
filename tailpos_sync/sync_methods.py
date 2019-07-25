@@ -141,22 +141,19 @@ def deleted_documents():
     returnArray = []
 
     for i in range(0, len(tables)):
-
-        data = frappe.db.sql(""" SELECT data FROM `tabDeleted Document` WHERE deleted_doctype=%s""", (tables[i]),
-                             as_dict=True)
-
-        for x in data:
+        data = frappe.db.sql("""SELECT data FROM `tabDeleted Document` WHERE deleted_doctype=%s""", tables[i], as_dict=True)
+        for row in data:
+            row_data = json.loads(row.data)
             try:
-                if json.loads(x.data)['id'] != None and x.sync_status == None:
+                if row_data.get('id') is not None and row.sync_status is None:
                     returnArray.append({
                         'tableNames': tableNames[i],
-                        '_id': json.loads(x.data)['id']
+                        '_id': row_data.get('id')
                     })
             except Exception:
                 print(frappe.get_traceback())
             try:
-                frappe.db.sql(""" UPDATE `tabDeleted Document` SET sync_status=%s WHERE data=%s""", ('true', x.data),
-                              as_dict=True)
+                frappe.db.sql("""UPDATE `tabDeleted Document` SET sync_status=%s WHERE data=%s""", ('true', row.data), as_dict=True)
             except Exception:
                 print(frappe.get_traceback())
 
