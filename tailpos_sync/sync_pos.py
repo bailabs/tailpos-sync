@@ -44,38 +44,7 @@ def sync_data(data):
     deleted_records = deleted_documents()
     delete_records(trash_object)
 
-    data_length = len(tailpos_data)
-
-    for i in range(0, data_length):
-        receipt_total = 0
-        db_name = tailpos_data[i]['dbName']
-        sync_object = tailpos_data[i]['syncObject']
-
-        if tailpos_data[i]['dbName'] != "Company":
-            if deleted_records_check(sync_object['_id'], deleted_records):
-                query = "SELECT name FROM `tab{0}` WHERE id='{1}'".format(db_name, sync_object['_id'])
-
-                try:
-                    exist = frappe.db.sql(query, as_dict=True)
-                except Exception:
-                    print(frappe.get_traceback())
-
-                if len(exist) > 0:
-                    frappe_table = frappe.get_doc(db_name, exist[0]['name'])
-
-                    if 'dateUpdated' in sync_object:
-                        update_data = check_modified(sync_object['dateUpdated'], frappe_table)
-                    else:
-                        update_data = True
-                    if update_data:
-                        insert_data(tailpos_data[i], frappe_table, receipt_total)
-                else:
-                    frappe_table = new_doc(tailpos_data[i])
-
-                    try:
-                        frappe_table.insert(ignore_permissions=True)
-                    except:
-                        frappe.log_error(frappe.get_traceback(), 'sync failed')
+    _sync_to_erpnext(tailpos_data, deleted_records)
 
     force_sync = (sync_type == "forceSync")
     erpnext_data = sync_from_erpnext(device_id, force_sync)
@@ -105,3 +74,39 @@ def check_modified(data, frappe_table):
             update_data = False
 
     return update_data
+
+
+def _sync_to_erpnext(tailpos_data, deleted_records):
+    for row in tailpos_data:
+        receipt_total = 0
+
+        db_name = row.get('dbName')
+        sync_object = row.get('syncObject')
+
+        _id = sync_object.get('_id')
+        date_updated = sync_object.get('dateUpdated')
+
+        if db_name != "Company":
+            if deleted_records_check(_id, deleted_records):
+                query = "SELECT name FROM `tab{0}` WHERE id='{1}'".format(db_name, _id)
+
+                try:
+                    exist = frappe.db.sql(query, as_dict=True)
+                except Exception:
+                    print(frappe.get_traceback())
+
+                if len(exist) > 0:
+                    frappe_table = frappe.get_doc(db_name, exist[0]['name'])
+
+                    if 'dateUpdated' in sync_object:
+                        update_data = check_modified(date_updated, frappe_table)
+                    else:
+                        update_data = True
+                    if update_data:
+                        insert_data(row, frappe_table, receipt_total)
+                else:
+                    frappe_table = new_doc(row)
+                    try:
+                        frappe_table.insert(ignore_permissions=True)
+                    except:
+                        frappe.log_error(frappe.get_traceback(), 'sync failed')
