@@ -135,29 +135,54 @@ def insert_data(data, frappe_table, receipt_total):
         print(frappe.get_traceback())
 
 
-def deleted_documents():
+def get_deleted_documents():
     tables = get_tables_for_sync()
-    tableNames = ["Items", "Categories", "Discounts", "Attendants", "Customer"]
-    returnArray = []
+    res = []
 
-    for i in range(0, len(tables)):
-        data = frappe.db.sql("""SELECT data FROM `tabDeleted Document` WHERE deleted_doctype=%s""", tables[i], as_dict=True)
-        for row in data:
-            row_data = json.loads(row.data)
-            try:
-                if row_data.get('id') is not None and row.sync_status is None:
-                    returnArray.append({
-                        'tableNames': tableNames[i],
-                        '_id': row_data.get('id')
-                    })
-            except Exception:
-                print(frappe.get_traceback())
-            try:
-                frappe.db.sql("""UPDATE `tabDeleted Document` SET sync_status=%s WHERE data=%s""", ('true', row.data), as_dict=True)
-            except Exception:
-                print(frappe.get_traceback())
+    for table in tables:
+        deleted_docs = frappe.get_all(
+            'Deleted Document',
+            fields=['name', 'data', 'sync_status'],
+            filters={'deleted_doctype': table}
+        )
 
-    return returnArray
+        for deleted_doc in deleted_docs:
+            name = deleted_doc.get('name')
+            sync_status = deleted_doc.get('sync_status', None)
+
+            data = json.loads(deleted_doc.data)
+            data_id = data.get('id', None)
+
+            if data_id and sync_status is None:
+                res.append({'tableNames': table, '_id': data_id})
+
+                frappe.db.sql("""
+                    UPDATE `tabDeleted Document`
+                    SET sync_status=%s
+                    WHERE name=%s
+                """, ('true', name))
+
+    frappe.db.commit()
+
+
+    # for i in range(0, len(tables)):
+    #     data = frappe.db.sql("""SELECT data FROM `tabDeleted Document` WHERE deleted_doctype=%s""", tables[i], as_dict=True)
+    #     for row in data:
+    #         row_data = json.loads(row.data)
+    #         try:
+    #             if row_data.get('id') is not None and row.sync_status is None:
+    #                 returnArray.append({
+    #                     'tableNames': tableNames[i],
+    #                     '_id': row_data.get('id')
+    #                 })
+    #         except Exception:
+    #             print(frappe.get_traceback())
+    #         try:
+    #             frappe.db.sql("""UPDATE `tabDeleted Document` SET sync_status=%s WHERE data=%s""", ('true', row.data), as_dict=True)
+    #         except Exception:
+    #             print(frappe.get_traceback())
+
+    return res
 
 
 def sync_from_erpnext(device=None, force_sync=True):

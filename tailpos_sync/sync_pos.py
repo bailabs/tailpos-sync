@@ -41,7 +41,7 @@ def sync_data(data):
     device_id = data['deviceId']
 
     uom_check()
-    deleted_records = deleted_documents()
+    deleted_records = get_deleted_documents()
     delete_records(trash_object)
 
     _sync_to_erpnext(tailpos_data, deleted_records)
