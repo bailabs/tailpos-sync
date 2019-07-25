@@ -89,11 +89,7 @@ def _sync_to_erpnext(tailpos_data, deleted_records):
         if db_name == "Company" or is_deleted_record(_id, deleted_records):
             continue
 
-        exist = frappe.db.sql(
-            "SELECT name FROM `tab{0}` WHERE id=%(_id)s".format(db_name),
-            {'_id': _id},
-            as_dict=True
-        )
+        exist = _get_doc(db_name, _id)
 
         if exist:
             frappe_table = frappe.get_doc(db_name, exist[0]['name'])
@@ -111,3 +107,11 @@ def _sync_to_erpnext(tailpos_data, deleted_records):
                 frappe_table.insert(ignore_permissions=True)
             except:
                 frappe.log_error(frappe.get_traceback(), 'sync failed')
+
+
+def _get_doc(db_name, _id):
+    return frappe.db.sql("""
+        SELECT name 
+        FROM `tab{0}` 
+        WHERE id=%(_id)s
+    """.format(db_name), {'_id': _id}, as_dict=True)
