@@ -5,20 +5,16 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from tailpos_sync.utils import set_date_updated
+
 import uuid
 
-class Payments(Document):
 
+class Payments(Document):
 	def autoname(self):
 		if not self.id:
 			self.id = 'Payment/' + str(uuid.uuid4())
 		self.name = self.id
+
 	def validate(self):
-		if self.date_updated == None:
-			print("sdadasdasd")
-			try:
-				print("sjhgdjakshdkashdkashdkjahsdkjh")
-				self.date_updated = self.modified
-			except Exception:
-				print("jhsdj")
-				print(frappe.get_traceback())
+		set_date_updated(self)
