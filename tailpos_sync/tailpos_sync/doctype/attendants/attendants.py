@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from tailpos_sync.utils import set_date_updated
 
 
 class Attendants(Document):
@@ -15,7 +16,7 @@ class Attendants(Document):
 
 	def validate(self):
 		_validate_pin_code(self)
-		_set_date_updated(self)
+		set_date_updated(self)
 
 
 def _validate_pin_code(doc):
@@ -26,8 +27,3 @@ def _validate_pin_code(doc):
 
 	if not doc.pin_code.isdigit():
 		frappe.throw(_('PIN should only be numbers.'))
-
-
-def _set_date_updated(doc):
-	if not doc.date_updated:
-		doc.date_updated = doc.modified
