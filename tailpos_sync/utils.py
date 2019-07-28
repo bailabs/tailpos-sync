@@ -86,7 +86,7 @@ def generate_sales_invoice_by_date(date):
         sales_invoice.insert()
         sales_invoice.submit()
     except Exception as e:
-        print str(e)
+        print(e)
 
 
 # DEPRECATED
