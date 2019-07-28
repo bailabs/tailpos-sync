@@ -12,7 +12,12 @@ class Categories(Document):
         self.name = self.description
 
     def validate(self):
-        if self.date_updated is None:
-            self.date_updated = self.modified
+        _set_date_updated(self)
+
         if not self.id:
             self.id = str(uuid.uuid4())
+
+
+def _set_date_updated(doc):
+    if doc.date_updated is None:
+        doc.date_updated = doc.modified
