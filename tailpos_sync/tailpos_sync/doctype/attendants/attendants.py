@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from tailpos_sync.utils import set_date_updated
+from tailpos_sync.utils import set_date_updated, set_doc_id
 
 
 class Attendants(Document):
@@ -16,6 +16,7 @@ class Attendants(Document):
 
 	def validate(self):
 		_validate_pin_code(self)
+		set_doc_id(self)
 		set_date_updated(self)
 
 
