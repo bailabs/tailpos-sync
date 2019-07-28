@@ -152,5 +152,16 @@ def _get_price_list(pos_profile):
 # Where is this called?
 @frappe.whitelist()
 def save_item(doc, method):
+    # TODO: refactor(?)
+    if doc.date_updated is None:
+        doc.date_updated = doc.modified
+
+
+def set_doc_id(doc):
+    if not doc.id:
+        doc.id = str(uuid.uuid4())
+
+
+def set_date_updated(doc):
     if doc.date_updated is None:
         doc.date_updated = doc.modified

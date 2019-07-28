@@ -4,7 +4,7 @@
 
 from __future__ import unicode_literals
 from frappe.model.document import Document
-import uuid
+from tailpos_sync.utils import set_doc_id, set_date_updated
 
 
 class Categories(Document):
@@ -12,12 +12,5 @@ class Categories(Document):
         self.name = self.description
 
     def validate(self):
-        _set_date_updated(self)
-
-        if not self.id:
-            self.id = str(uuid.uuid4())
-
-
-def _set_date_updated(doc):
-    if doc.date_updated is None:
-        doc.date_updated = doc.modified
+        set_doc_id(self)
+        set_date_updated(self)
