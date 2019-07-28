@@ -3,7 +3,9 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+
 import frappe
+from frappe import _
 from frappe.model.document import Document
 
 
@@ -12,19 +14,20 @@ class Attendants(Document):
 		self.name = self.user_name + "-" + self.role
 
 	def validate(self):
-		if self.pin_code is not None:
-			length = len(self.pin_code)
+		_validate_pin_code(self)
+		_set_date_updated(self)
 
-			if int(length) != 4:
-				frappe.throw(_("PIN Code should contain 4 numbers only."))
 
-			try:
-				pin_code = int(self.pin_code)
-			except:
-				frappe.throw(_("PIN Code should be a number."))
+def _validate_pin_code(doc):
+	pin_code_length = len(doc.pin_code)
 
-		if self.date_updated is None:
-			try:
-				self.date_updated = self.modified
-			except Exception:
-				print(frappe.get_traceback())
+	if pin_code_length != 4:
+		frappe.throw(_('PIN should contain 4 numbers.'))
+
+	if not doc.pin_code.isdigit():
+		frappe.throw(_('PIN should only be numbers.'))
+
+
+def _set_date_updated(doc):
+	if not doc.date_updated:
+		doc.date_updated = doc.modified
