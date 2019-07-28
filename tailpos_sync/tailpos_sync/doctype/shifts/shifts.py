@@ -5,13 +5,16 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from tailpos_sync.utils import set_date_updated
+
 import uuid
 
+
 class Shifts(Document):
-	def validate(self):
-		if self.date_updated == None:
-			self.date_updated = self.modified
 	def autoname(self):
 		if not self.id:
 			self.id = 'Shift/' + str(uuid.uuid4())
 		self.name = self.id
+
+	def validate(self):
+		set_date_updated(self)

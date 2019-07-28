@@ -5,6 +5,8 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from tailpos_sync.utils import set_date_updated
+
 import uuid
 
 
@@ -15,11 +17,7 @@ class Receipts(Document):
 		self.name = self.id
 
 	def validate(self):
-		if self.date_updated == None:
-			try:
-				self.date_updated = self.modified
-			except Exception:
-				print(frappe.get_traceback())
+		set_date_updated(self)
 
 	def set_total_amount(self):
 		self.total_amount = 0
