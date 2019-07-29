@@ -14,3 +14,12 @@ class Discounts(Document):
     def validate(self):
         set_doc_id(self)
         set_date_updated(self)
+        _set_percentagetype(self)
+
+
+def _set_percentagetype(doc):
+    discount_type = {
+        'Percentage': 'percentage',
+        'Fix Discount': 'fixDiscount'
+    }
+    doc.percentagetype = discount_type[doc.type]
