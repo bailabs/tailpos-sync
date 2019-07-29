@@ -305,10 +305,12 @@ def new_doc(data, owner='Administrator'):
         })
 
     elif db_name == 'Discounts':
+        percentage_type = sync_object.get('percentageType')
         doc.update({
             'description': sync_object['name'],
             'value': sync_object['value'],
-            'percentagetype': sync_object['percentageType']
+            'percentagetype': percentage_type,
+            'type': _get_discount_type(percentage_type)
         })
 
     elif db_name == 'Attendants':
@@ -424,6 +426,7 @@ def update_sync_data(data, table):
 
     return res
 
+
 def get_default_company():
     default_company = frappe.get_single('Tail Settings')
     res = []
@@ -432,3 +435,11 @@ def get_default_company():
         'syncObject': default_company
     })
     return res
+
+
+def _get_discount_type(percentage_type):
+    discount_type = {
+        'fixDiscount': 'Fix Discount',
+        'percentage': 'Percentage'
+    }
+    return discount_type[percentage_type]
