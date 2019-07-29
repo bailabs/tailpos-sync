@@ -19,17 +19,24 @@ fixtures = [
                 "name",
                 "in",
                 [
-                    "Item-barcode",
-                    "Item-in_tailpos",
                     "Customer-note",
                     "Customer-phonenumber",
                     "Customer-email",
                     "Customer-id",
                     "Customer-date_updated",
                     "Deleted Document-sync_status",
+                    "Item-tail_sb",
+                    "Item-tail_cb",
                     "Item-date_updated",
                     "Item-id",
-                    "Item-favorite"
+                    "Item-favorite",
+                    "Item-barcode",
+                    "Item-in_tailpos",
+                    "Item-sku",
+                    "Item-color",
+                    "Item-shape",
+                    "Item-category",
+                    "Item-color_or_image"
                 ]
             ]
         ]
