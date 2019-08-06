@@ -96,3 +96,6 @@
 - added: doctype Remarks Template
 - remove: unnecessary functions in Categories
 - refactor: get_all to get_items_with_standard_rate
+
+### v1.7.0 [6 августа 2019]
+- added: MOP table under Tail Settings and Device
