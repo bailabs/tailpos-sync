@@ -117,12 +117,22 @@ def _get_mode_of_payment(type, device=None):
 
 
 def _get_device_mode_of_payment(device, type):
-    if type == 'Cash':
-        return frappe.db.get_value('Device', device, 'cash_mop')
-    elif type == 'Card':
-        return frappe.db.get_value('Device', device, 'card_mop')
-    return None
+    # DEPRECATED
+    # if type == 'Cash':
+    #     return frappe.db.get_value('Device', device, 'cash_mop')
+    # elif type == 'Card':
+    #     return frappe.db.get_value('Device', device, 'card_mop')
+
+    mop = frappe.get_all('Device Payment', filters={'parent': device, 'payment_type': type}, fields=['mode_of_payment'])
+
+    if not mop:
+        frappe.throw(
+            _('Set the device mode of payment for {}'.format(type))
+        )
+
+    return mop
 
 
 def test():
     _get_mode_of_payment('Visa')
+    _get_device_mode_of_payment('5663d5f38d', 'Visa')
