@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 from frappe.utils.background_jobs import enqueue
 from .utils import get_receipt_items
 
@@ -96,17 +97,23 @@ def _get_receipts_payment_type(receipt):
 
 
 def _get_mode_of_payment(type, device=None):
-    mode_of_payment = None
-
     if device:
         return _get_device_mode_of_payment(device, type)
 
-    if type == 'Cash':
-        mode_of_payment = frappe.db.get_single_value('Tail Settings', 'cash_mop')
-    elif type == 'Card':
-        mode_of_payment = frappe.db.get_single_value('Tail Settings', 'card_mop')
+    # DEPRECATED
+    # if type == 'Cash':
+    #     mode_of_payment = frappe.db.get_single_value('Tail Settings', 'cash_mop')
+    # elif type == 'Card':
+    #     mode_of_payment = frappe.db.get_single_value('Tail Settings', 'card_mop')
 
-    return mode_of_payment
+    mop = frappe.get_all('Tail Settings Payment', filters={'payment_type': type}, fields=['mode_of_payment'])
+
+    if not mop:
+        frappe.throw(
+            _('Set the mode of payment for {}'.format(type))
+        )
+
+    return mop[0]
 
 
 def _get_device_mode_of_payment(device, type):
@@ -115,3 +122,7 @@ def _get_device_mode_of_payment(device, type):
     elif type == 'Card':
         return frappe.db.get_value('Device', device, 'card_mop')
     return None
+
+
+def test():
+    _get_mode_of_payment('Visa')
