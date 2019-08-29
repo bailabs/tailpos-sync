@@ -19,6 +19,7 @@ def generate_si_from_receipts():
     submit_invoice = frappe.db.get_single_value('Tail Settings', 'submit_invoice')
     use_device_profile = frappe.db.get_single_value('Tail Settings', 'use_device_profile')
     generate_limit = frappe.db.get_single_value('Tail Settings', 'generate_limit')
+    allow_negative_stock = frappe.db.get_single_value('Stock Settings', 'allow_negative_stock')
     print("GENERAAAATE LIMIIIIT")
     print(generate_limit)
     company = frappe.db.get_value('POS Profile', pos_profile, 'company')
@@ -44,7 +45,6 @@ def generate_si_from_receipts():
 
         if type:
             mop = _get_mode_of_payment(type[0], device=device)
-
         si = frappe.get_doc({
             'doctype': 'Sales Invoice',
             'is_pos': 1,
@@ -59,7 +59,7 @@ def generate_si_from_receipts():
                 'qty': item['qty']
             })
 
-        _insert_invoice(si, mop, submit_invoice)
+        _insert_invoice(si, mop, submit_invoice,allow_negative_stock)
 
         # ticked `Generated Sales Invoice`
         frappe.db.set_value('Receipts', receipt.name, 'generated', 1)
@@ -68,25 +68,31 @@ def generate_si_from_receipts():
 
 
 # Helper
-def _insert_invoice(invoice, mop, submit=False):
+def _insert_invoice(invoice, mop, submit=False,allow_negative_stock=False):
     invoice.set_missing_values()
     invoice.insert()
-
     invoice.append('payments', {
-        'mode_of_payment': mop,
+        'mode_of_payment': mop[0].mode_of_payment,
         'amount': invoice.outstanding_amount
     })
     invoice.save()
 
-    if submit and not _check_items_zero_qty(invoice.items):
+    check_stock_qty = _check_items_zero_qty(invoice.items)
+    if check_stock_qty and allow_negative_stock:
+        check_stock_qty = False
+
+    if submit and not check_stock_qty:
         invoice.submit()
 
 
 def _check_items_zero_qty(items):
+    print("ITEEEEMS")
+    print(items)
     for item in items:
+        print("ACTUUAAAL QTTTTY")
+        print(item.actual_qty)
         if item.actual_qty <= 0:
             return True
-
 
 def _get_device_pos_profile(device):
     return frappe.db.get_value('Device', device, 'pos_profile')
@@ -122,9 +128,10 @@ def _get_device_mode_of_payment(device, type):
     #     return frappe.db.get_value('Device', device, 'cash_mop')
     # elif type == 'Card':
     #     return frappe.db.get_value('Device', device, 'card_mop')
-
+    print(device)
+    print(type)
     mop = frappe.get_all('Device Payment', filters={'parent': device, 'payment_type': type}, fields=['mode_of_payment'])
-
+    print(mop)
     if not mop:
         frappe.throw(
             _('Set the device mode of payment for {}'.format(type))
