@@ -1,4 +1,4 @@
-from sync_methods import *
+from .sync_methods import *
 import frappe
 import datetime
 
