@@ -56,11 +56,12 @@ def generate_sales_invoice_by_date(date):
         'posting_date': date,
         'due_date': date,
         'title': date,
-        'update_stock': 1
+        'update_stock': 1,
     })
 
     for receipt in receipts:
         lines = generate_sales_invoice_lines(receipt.name)
+        sales_invoice.db_set("total_taxes_and_charges", receipts.taxesvalue)
         sales_invoice.extend('items', lines)
 
     shifts = shifts_by_date(date)
@@ -135,7 +136,12 @@ def get_items_with_price_list_query(columns=None, pos_profile=None):
 
     columns_str = ', '.join(columns) if columns else '*'
 
-    query = """SELECT %s FROM `tabItem` INNER JOIN `tabItem Price` ON `tabItem`.name = `tabItem Price`.item_code WHERE `tabItem`.in_tailpos = 1 AND `tabItem Price`.price_list='%s'""" % (columns_str, price_list)
+    query = """
+      SELECT %s FROM `tabItem` 
+      INNER JOIN `tabItem Price` ON `tabItem`.name = `tabItem Price`.item_code
+      INNER JOIN `tabItem Tax` ON `tabItem`.name = `tabItem Tax`.parent
+      INNER JOIN `tabItem Tax Template Detail` ON `tabItem Tax Template Detail`.parent = `tabItem Tax`.item_tax_template
+      WHERE `tabItem`.in_tailpos = 1 AND `tabItem Price`.price_list='%s'""" % (columns_str, price_list)
 
     return query
 

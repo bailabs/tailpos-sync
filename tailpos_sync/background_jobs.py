@@ -42,16 +42,22 @@ def generate_si_from_receipts():
 
         type = _get_receipts_payment_type(receipt.name)
         items = get_receipt_items(receipt.name)
-
+        receipt_info = get_receipt(receipt.name)
+        customer = get_customer(receipt_info.customer)
         if type:
             mop = _get_mode_of_payment(type[0], device=device)
+        print("CUSTOMER")
+        print(customer)
         si = frappe.get_doc({
             'doctype': 'Sales Invoice',
             'is_pos': 1,
             'pos_profile': pos_profile,
-            'company': company
+            'company': company,
+            "debit_to": "Debtors - BWAML",
+            "due_date": receipt_info.date,
+            "customer": customer.customer_name
         })
-
+        print(receipt.name)
         for item in items:
             si.append('items', {
                 'item_code': item['item'],
@@ -59,7 +65,7 @@ def generate_si_from_receipts():
                 'qty': item['qty']
             })
 
-        _insert_invoice(si, mop, submit_invoice,allow_negative_stock)
+        _insert_invoice(si, mop, receipt_info.taxesvalue, submit_invoice,allow_negative_stock)
 
         # ticked `Generated Sales Invoice`
         frappe.db.set_value('Receipts', receipt.name, 'generated', 1)
@@ -68,11 +74,12 @@ def generate_si_from_receipts():
 
 
 # Helper
-def _insert_invoice(invoice, mop, submit=False,allow_negative_stock=False):
+def _insert_invoice(invoice, mop,taxes_total, submit=False,allow_negative_stock=False):
     invoice.set_missing_values()
     invoice.insert()
+    print(mop)
     invoice.append('payments', {
-        'mode_of_payment': mop[0].mode_of_payment,
+        'mode_of_payment': mop.mode_of_payment,
         'amount': invoice.outstanding_amount
     })
     invoice.save()
@@ -83,14 +90,19 @@ def _insert_invoice(invoice, mop, submit=False,allow_negative_stock=False):
 
     if submit and not check_stock_qty:
         invoice.submit()
+        from frappe.utils import money_in_words
+        frappe.db.set_value("Sales Invoice", invoice.name, "total_taxes_and_charges", taxes_total)
+        frappe.db.set_value("Sales Invoice", invoice.name, "total_taxes_and_charges", taxes_total)
+        frappe.db.set_value("Sales Invoice", invoice.name, "grand_total", float(invoice.grand_total) + float(taxes_total))
+        frappe.db.set_value("Sales Invoice", invoice.name, "rounded_total", round(float(invoice.grand_total) + float(taxes_total)))
+        frappe.db.set_value("Sales Invoice", invoice.name, "outstanding_amount", round(float(invoice.grand_total) + float(taxes_total)))
+        frappe.db.set_value("Sales Invoice", invoice.name, "paid_amount", round(float(invoice.grand_total) + float(taxes_total)))
+        frappe.db.set_value("Sales Invoice", invoice.name, "in_words", money_in_words(round(float(invoice.grand_total) + float(taxes_total)), invoice.currency))
+        frappe.db.commit()
 
 
 def _check_items_zero_qty(items):
-    print("ITEEEEMS")
-    print(items)
     for item in items:
-        print("ACTUUAAAL QTTTTY")
-        print(item.actual_qty)
         if item.actual_qty <= 0:
             return True
 
@@ -139,6 +151,11 @@ def _get_device_mode_of_payment(device, type):
 
     return mop
 
+def get_receipt(receipt_name):
+    return frappe.db.sql(""" SELECT * FROM tabReceipts WHERE name=%s""",receipt_name, as_dict=True)[0]
+
+def get_customer(id):
+    return frappe.db.sql(""" SELECT * FROM tabCustomer WHERE id=%s""",id, as_dict=True)[0]
 
 def test():
     _get_mode_of_payment('Visa')

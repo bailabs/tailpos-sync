@@ -116,6 +116,9 @@ doc_events = {
         "validate": "tailpos_sync.doc_events.item.validate",
         "before_save": "tailpos_sync.doc_events.item.before_save"
     },
+    "Sales Invoice": {
+        "before_save": "tailpos_sync.doc_events.sales_invoice.validate",
+    },
 }
 
 # Scheduled Tasks

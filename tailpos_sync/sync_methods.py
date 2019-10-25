@@ -26,6 +26,7 @@ def get_item_query(pos_profile):
         'tabItem.stock_uom',
         'tabItem.item_name',
         'tabItem.color_or_image',
+        '`tabItem Tax Template Detail`.tax_rate'
     ]
 
     standard_rate = 'standard_rate'
@@ -196,6 +197,8 @@ def sync_from_erpnext(device=None, force_sync=True):
     for table in tables:
         query = get_table_select_query(table, force_sync, pos_profile=pos_profile)
         query_data = frappe.db.sql(query, as_dict=True)
+        print("QUERY DAAATAA")
+        print(query_data)
         sync_data = update_sync_data(query_data, table)
 
         if sync_data:
@@ -339,12 +342,14 @@ def new_doc(data, owner='Administrator'):
         })
 
     elif db_name == 'Receipts':
+        print("RECEIIIIIIIIIIPPPPPTTTTSSSSSS")
+        print(sync_object)
         doc.update({
             'status': sync_object['status'].capitalize(),
             'shift': sync_object['shift'],
             'customer': sync_object['customer'],
             'attendant': sync_object['attendant'],
-            'taxesvalue': sync_object['taxesValue'],
+            'taxesvalue': sync_object['taxesAmount'],
             'discount': sync_object['discount'],
             'reason': sync_object['reason'],
             'deviceid': sync_object['deviceId'],
@@ -396,14 +401,11 @@ def uom_check():
 
 
 def get_category(id):
-    print(id)
-    print("CATEGORY")
     try:
         data = frappe.db.sql(""" SELECT description FROM `tabCategories` WHERE id=%s """, (id), as_dict=True)
     except Exception:
         print(frappe.get_traceback())
     data_value = ""
-    print(data)
     if len(data) > 0:
         if data[0]['description']:
             data_value = data[0]['description']
