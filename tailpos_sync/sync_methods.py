@@ -10,7 +10,7 @@ def get_tables_for_sync():
     return ['Item', 'Customer', 'Categories', 'Discounts', 'Attendants']
 
 
-def get_item_query(pos_profile):
+def get_item_query(pos_profile,device):
     use_price_list = frappe.db.get_single_value('Tail Settings', 'use_price_list')
 
     columns = [
@@ -36,14 +36,14 @@ def get_item_query(pos_profile):
 
     columns.append(standard_rate)
 
-    return get_items_with_price_list_query(columns, pos_profile)
+    return get_items_with_price_list_query(device,columns, pos_profile)
 
 
-def get_table_select_query(table, force_sync=True, pos_profile=None):
+def get_table_select_query(table,device, force_sync=True, pos_profile=None):
     query = "SELECT * FROM `tab{0}`".format(table)
 
     if table == 'Item':
-        query = get_item_query(pos_profile)
+        query = get_item_query(pos_profile,device)
 
     if not force_sync:
         connector = " AND " if "WHERE" in query else " WHERE "
@@ -191,11 +191,13 @@ def sync_from_erpnext(device=None, force_sync=True):
     tables = get_tables_for_sync()
     pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
 
+    print("DEVIIIIIIIIIIIIIIIIIIIIIIIIIIICE")
+    print(device)
     default_company = get_default_company()
     data.extend(default_company)
 
     for table in tables:
-        query = get_table_select_query(table, force_sync, pos_profile=pos_profile)
+        query = get_table_select_query(table,device, force_sync, pos_profile=pos_profile)
         query_data = frappe.db.sql(query, as_dict=True)
         print("QUERY DAAATAA")
         print(query_data)
@@ -215,6 +217,8 @@ def force_sync_from_erpnext_to_tailpos(device=None):
     :param device:
     :retdilurn data:
     """
+    print("DEVIIIIIIIIIIIIIIIIIIIIIIIIIIICE")
+    print(device)
     data = []
     tables = get_tables_for_sync()
 
@@ -223,7 +227,7 @@ def force_sync_from_erpnext_to_tailpos(device=None):
 
     try:
         for table in tables:
-            query = get_table_select_query(table, pos_profile=pos_profile)
+            query = get_table_select_query(table, device,pos_profile=pos_profile)
             query_data = frappe.db.sql(query, as_dict=True)
             sync_data = update_sync_data(query_data, table)
             data.extend(sync_data)
@@ -243,12 +247,13 @@ def sync_from_erpnext_to_tailpos(device=None):
     """
     data = []
     tables = get_tables_for_sync()
-
+    print("DEVIIIIIIIIIIIIIIIIIIIIIIIIIIICE")
+    print(device)
     if device:
         pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
 
     for table in tables:
-        query = get_table_select_query(table, False, pos_profile=pos_profile)
+        query = get_table_select_query(table,device, False, pos_profile=pos_profile)
         query_data = frappe.db.sql(query, as_dict=True)
 
         # Kung naay sulod
