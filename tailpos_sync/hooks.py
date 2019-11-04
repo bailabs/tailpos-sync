@@ -36,7 +36,9 @@ fixtures = [
                     "Item-color",
                     "Item-shape",
                     "Item-category",
-                    "Item-color_or_image"
+                    "Item-color_or_image",
+                    "Payment Entry-wallet_card_number",
+                    "Payment Entry-top_up_wallet"
                 ]
             ]
         ]
@@ -58,7 +60,7 @@ fixtures = [
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {"Payment Entry" : "public/js/payment_entry.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -118,6 +120,9 @@ doc_events = {
     },
     "Sales Invoice": {
         "before_save": "tailpos_sync.doc_events.sales_invoice.validate",
+    },
+    "Payment Entry": {
+        "on_submit": "tailpos_sync.doc_events.payment_entry.on_submit",
     },
 }
 

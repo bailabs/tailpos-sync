@@ -56,7 +56,8 @@ def sync_data(data):
         "data": erpnext_data,
         "deleted_documents": deleted_records
     }
-
+    print("RETURN DATA")
+    print({"data": res})
     return {"data": res}
 
 
