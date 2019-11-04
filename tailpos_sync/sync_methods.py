@@ -41,7 +41,6 @@ def get_item_query(pos_profile,device):
 
 def get_table_select_query(table,device, force_sync=True, pos_profile=None):
     query = "SELECT * FROM `tab{0}`".format(table)
-
     if table == 'Item':
         query = get_item_query(pos_profile,device)
 
@@ -191,16 +190,12 @@ def sync_from_erpnext(device=None, force_sync=True):
     tables = get_tables_for_sync()
     pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
 
-    print("DEVIIIIIIIIIIIIIIIIIIIIIIIIIIICE")
-    print(device)
     default_company = get_default_company()
     data.extend(default_company)
 
     for table in tables:
         query = get_table_select_query(table,device, force_sync, pos_profile=pos_profile)
         query_data = frappe.db.sql(query, as_dict=True)
-        print("QUERY DAAATAA")
-        print(query_data)
         sync_data = update_sync_data(query_data, table)
 
         if sync_data:
@@ -217,8 +212,6 @@ def force_sync_from_erpnext_to_tailpos(device=None):
     :param device:
     :retdilurn data:
     """
-    print("DEVIIIIIIIIIIIIIIIIIIIIIIIIIIICE")
-    print(device)
     data = []
     tables = get_tables_for_sync()
 
@@ -247,8 +240,6 @@ def sync_from_erpnext_to_tailpos(device=None):
     """
     data = []
     tables = get_tables_for_sync()
-    print("DEVIIIIIIIIIIIIIIIIIIIIIIIIIIICE")
-    print(device)
     if device:
         pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
 
@@ -347,8 +338,6 @@ def new_doc(data, owner='Administrator'):
         })
 
     elif db_name == 'Receipts':
-        print("RECEIIIIIIIIIIPPPPPTTTTSSSSSS")
-        print(sync_object)
         doc.update({
             'status': sync_object['status'].capitalize(),
             'shift': sync_object['shift'],
