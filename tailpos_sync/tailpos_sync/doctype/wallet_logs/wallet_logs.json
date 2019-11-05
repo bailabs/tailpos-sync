@@ -1,0 +1,94 @@
+{
+ "creation": "2019-11-05 14:06:18.135741",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "wallet",
+  "prepaid_balance_before_deduction",
+  "credit_balance_before_deduction",
+  "amount",
+  "prepaid_after_before_deduction",
+  "credit_balance_after_deduction",
+  "attendant",
+  "device"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "prepaid_balance_before_deduction",
+   "fieldtype": "Currency",
+   "label": "Prepaid Balance(Before Deduction)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "credit_balance_before_deduction",
+   "fieldtype": "Currency",
+   "label": "Credit Balance(Before Deduction)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "label": "Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "prepaid_after_before_deduction",
+   "fieldtype": "Currency",
+   "label": "Prepaid Balance(After Deduction)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "credit_balance_after_deduction",
+   "fieldtype": "Currency",
+   "label": "Credit Balance(After Deduction)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "attendant",
+   "fieldtype": "Data",
+   "label": "Attendant",
+   "read_only": 1
+  },
+  {
+   "fieldname": "wallet",
+   "fieldtype": "Link",
+   "label": "Wallet Card Number",
+   "options": "Wallet",
+   "read_only": 1
+  },
+  {
+   "fieldname": "device",
+   "fieldtype": "Link",
+   "label": "Device",
+   "options": "Device",
+   "read_only": 1
+  }
+ ],
+ "modified": "2019-11-05 16:33:11.521214",
+ "modified_by": "Administrator",
+ "module": "TailPOS Sync",
+ "name": "Wallet Logs",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
