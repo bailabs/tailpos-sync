@@ -3,20 +3,17 @@ import datetime
 
 @frappe.whitelist()
 def validate_customer_wallet(data):
-    print("CHECK")
-    print(data)
-    try:
-        wallet_data = data['wallet'] #WALLET DATA FROM TAILPOS
-        receipt = data['receipt'] #RECEIPT RECORD FROM TAILPOS
-        device = data['device_id'] #DEVICE ID FROM TAILPOS
-        receipt_total = get_receipt_total(receipt) #GET RECEIPT TOTAL
-        balances = get_wallet(wallet_data) #BALANCE BEFORE DEDUCTIONS
-        update_wallet = update_wallet_card(wallet_data,receipt_total) #UPDATE WALLET
-        create_wallet_logs(wallet_data,update_wallet,receipt,balances,device) #CREATE WALLET LOGS
 
-        return {"message": update_wallet[0], "failed": update_wallet[1] }
-    except:
-        print(frappe.get_traceback())
+    wallet_data = data['wallet'] #WALLET DATA FROM TAILPOS
+    receipt = data['receipt'] #RECEIPT RECORD FROM TAILPOS
+    device = data['device_id'] #DEVICE ID FROM TAILPOS
+    receipt_total = get_receipt_total(receipt) #GET RECEIPT TOTAL
+    balances = get_wallet(wallet_data) #BALANCE BEFORE DEDUCTIONS
+    update_wallet = update_wallet_card(wallet_data,receipt_total) #UPDATE WALLET
+    create_wallet_logs(wallet_data,update_wallet,receipt,balances,device) #CREATE WALLET LOGS
+
+    return {"message": update_wallet[0], "failed": update_wallet[1] }
+
 def update_wallet_card(wallet_data,receipt_total):
     wallet_record = get_wallet(wallet_data)
     if len(wallet_record) > 0:
