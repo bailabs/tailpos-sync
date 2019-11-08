@@ -39,7 +39,8 @@ def sync_data(data):
     tailpos_data = data['tailposData']
     sync_type = data['typeOfSync']
     device_id = data['deviceId']
-
+    print("DATAAAAAAAAAAAA")
+    print(data)
     uom_check()
     deleted_records = get_deleted_documents()
     delete_records(trash_object)

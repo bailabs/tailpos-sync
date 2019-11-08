@@ -332,11 +332,9 @@ def new_doc(data, owner='Administrator'):
     elif db_name == 'Payments':
         doc.update({
             'paid': sync_object['paid'],
-            'type': sync_object['type'],
             'receipt': sync_object['receipt'],
             'date': get_date_fromtimestamp(sync_object['date'])
         })
-
     elif db_name == 'Receipts':
         doc.update({
             'status': sync_object['status'].capitalize(),
@@ -353,10 +351,23 @@ def new_doc(data, owner='Administrator'):
             'date': get_date_fromtimestamp(sync_object['date']),
             'receipt_lines': get_receipt_lines(sync_object['lines']),
         })
+    if db_name != "Payments":
+        return frappe.get_doc(doc)
+    else:
+        try:
+            payment = frappe.get_doc(doc)
+            if sync_object['type']:
+                for i in json.loads(sync_object['type']):
+                    print(i['type'])
+                    print(i['amount'])
+                    payment.append("payment_types", {
+                        "type": i['type'],
+                        "amount": i['amount'],
+                    })
 
-    return frappe.get_doc(doc)
-
-
+            return payment
+        except:
+            print(frappe.get_traceback())
 def get_receipt_lines(lines):
     receipt_lines = []
 

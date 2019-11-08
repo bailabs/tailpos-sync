@@ -46,8 +46,7 @@ def generate_si_from_receipts():
         customer = get_customer(receipt_info.customer)
         if type:
             mop = _get_mode_of_payment(type[0], device=device)
-        print("CUSTOMER")
-        print(customer)
+
         si = frappe.get_doc({
             'doctype': 'Sales Invoice',
             'is_pos': 1,
@@ -57,7 +56,7 @@ def generate_si_from_receipts():
             "due_date": receipt_info.date,
             "customer": customer.customer_name
         })
-        print(receipt.name)
+
         for item in items:
             si.append('items', {
                 'item_code': item['item'],
@@ -75,13 +74,21 @@ def generate_si_from_receipts():
 
 # Helper
 def _insert_invoice(invoice, mop,taxes_total, submit=False,allow_negative_stock=False):
-    invoice.set_missing_values()
+
     invoice.insert()
-    print(mop)
-    invoice.append('payments', {
-        'mode_of_payment': mop.mode_of_payment,
-        'amount': invoice.outstanding_amount
-    })
+    if len(mop) > 0:
+        for x in mop:
+            print(x)
+            invoice.append('payments', {
+                'mode_of_payment': x['mode_of_payment'],
+                'amount': x['amount']
+            })
+    else:
+        invoice.append('payments', {
+            'mode_of_payment': "Cash",
+            'amount': invoice.outstanding_amount
+        })
+    invoice.set_missing_values()
     invoice.save()
 
     check_stock_qty = _check_items_zero_qty(invoice.items)
@@ -111,45 +118,43 @@ def _get_device_pos_profile(device):
 
 
 def _get_receipts_payment_type(receipt):
-    return frappe.db.sql_list("""SELECT type FROM `tabPayments` WHERE receipt=%s""", receipt)
-
+    payment = frappe.db.sql_list("""SELECT name FROM `tabPayments` WHERE receipt=%s""", receipt)
+    return frappe.db.sql(""" SELECT * FROM `tabPayment Types` WHERE parent=%s """, payment[0], as_dict=True)
 
 def _get_mode_of_payment(type, device=None):
     if device:
         return _get_device_mode_of_payment(device, type)
+    mode_of_payment = []
+    for i in type:
+        mop = frappe.get_all('Tail Settings Payment', filters={'payment_type': i.type}, fields=['mode_of_payment'])
 
-    # DEPRECATED
-    # if type == 'Cash':
-    #     mode_of_payment = frappe.db.get_single_value('Tail Settings', 'cash_mop')
-    # elif type == 'Card':
-    #     mode_of_payment = frappe.db.get_single_value('Tail Settings', 'card_mop')
-
-    mop = frappe.get_all('Tail Settings Payment', filters={'payment_type': type}, fields=['mode_of_payment'])
-
-    if not mop:
-        frappe.throw(
-            _('Set the mode of payment for {}'.format(type))
-        )
-
-    return mop[0]
+        if not mop:
+            frappe.throw(
+                _('Set the mode of payment for {} in Tail Settings'.format(i.type))
+            )
+        else:
+            mode_of_payment.append({
+                "mode_of_payment": i.type,
+                "amount": i.amount
+            })
+    return mode_of_payment
 
 
 def _get_device_mode_of_payment(device, type):
-    # DEPRECATED
-    # if type == 'Cash':
-    #     return frappe.db.get_value('Device', device, 'cash_mop')
-    # elif type == 'Card':
-    #     return frappe.db.get_value('Device', device, 'card_mop')
-    print(device)
-    print(type)
-    mop = frappe.get_all('Device Payment', filters={'parent': device, 'payment_type': type}, fields=['mode_of_payment'])
-    print(mop)
-    if not mop:
-        frappe.throw(
-            _('Set the device mode of payment for {}'.format(type))
-        )
+    mode_of_payment = []
+    for i in type:
+        mop = frappe.get_all('Device Payment', filters={'parent': device, 'payment_type': i.type}, fields=['mode_of_payment'])
 
-    return mop
+        if not mop:
+            frappe.throw(
+                _('Set the device mode of payment for {} in device {}'.format(type,device))
+            )
+        else:
+            mode_of_payment.append({
+                "mode_of_payment": i.type,
+                "amount": i.amount
+            })
+    return mode_of_payment
 
 def get_receipt(receipt_name):
     return frappe.db.sql(""" SELECT * FROM tabReceipts WHERE name=%s""",receipt_name, as_dict=True)[0]
@@ -158,5 +163,35 @@ def get_customer(id):
     return frappe.db.sql(""" SELECT * FROM tabCustomer WHERE id=%s""",id, as_dict=True)[0]
 
 def test():
-    _get_mode_of_payment('Visa')
-    _get_device_mode_of_payment('5663d5f38d', 'Visa')
+    pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
+    submit_invoice = frappe.db.get_single_value('Tail Settings', 'submit_invoice')
+
+    allow_negative_stock = frappe.db.get_single_value('Stock Settings', 'allow_negative_stock')
+
+    company = frappe.db.get_value('POS Profile', pos_profile, 'company')
+    type = _get_receipts_payment_type("Receipt/6d34abf1-013e-11ea-88c1-35be9db41f9c")
+    items = get_receipt_items("Receipt/6d34abf1-013e-11ea-88c1-35be9db41f9c")
+    receipt_info = get_receipt("Receipt/6d34abf1-013e-11ea-88c1-35be9db41f9c")
+    customer = get_customer(receipt_info.customer)
+    if type:
+        print(type)
+        mop = _get_mode_of_payment(type, device="c9abc69240")
+
+    si = frappe.get_doc({
+        'doctype': 'Sales Invoice',
+        'is_pos': 1,
+        'pos_profile': pos_profile,
+        'company': company,
+        "debit_to": "Debtors - BWAML",
+        "due_date": receipt_info.date,
+        "customer": customer.customer_name
+    })
+
+    for item in items:
+        si.append('items', {
+            'item_code': item['item'],
+            'rate': item['price'],
+            'qty': item['qty']
+        })
+
+    _insert_invoice(si, mop, receipt_info.taxesvalue, submit_invoice, allow_negative_stock)
