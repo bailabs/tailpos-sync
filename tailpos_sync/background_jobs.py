@@ -125,35 +125,35 @@ def _get_mode_of_payment(type, device=None):
     mode_of_payment = []
     print(type)
     for i in type:
-        mop = frappe.get_all('Tail Settings Payment', filters={'payment_type': i.type}, fields=['mode_of_payment'])
-
-        if not mop:
-            frappe.throw(
-                _('Set the mode of payment for {} in Tail Settings'.format(i.type))
-            )
-        else:
-            mode_of_payment.append({
-                "mode_of_payment": mop[0].mode_of_payment,
-                "amount": i.amount
-            })
+        # mop = frappe.get_all('Tail Settings Payment', filters={'payment_type': i.type}, fields=['mode_of_payment'])
+        #
+        # if not mop:
+        #     frappe.throw(
+        #         _('Set the mode of payment for {} in Tail Settings'.format(i.type))
+        #     )
+        # else:
+        mode_of_payment.append({
+            "mode_of_payment": i.type,
+            "amount": i.amount
+        })
     return mode_of_payment
 
 
 def _get_device_mode_of_payment(device, type):
     mode_of_payment = []
     for i in type:
-        print(i.type)
-        mop = frappe.get_all('Device Payment', filters={'parent': device, 'payment_type': i.type}, fields=['mode_of_payment'])
+        # print(i.type)
+        # mop = frappe.get_all('Device Payment', filters={'parent': device, 'payment_type': i.type}, fields=['mode_of_payment'])
 
-        if not mop:
-            frappe.throw(
-                _('Set the device mode of payment for {} in device {}'.format(type,device))
-            )
-        else:
-            mode_of_payment.append({
-                "mode_of_payment": mop[0].mode_of_payment,
-                "amount": i.amount
-            })
+        # if not mop:
+        #     frappe.throw(
+        #         _('Set the device mode of payment for {} in device {}'.format(type,device))
+        #     )
+        # else:
+        mode_of_payment.append({
+            "mode_of_payment": i.type,
+            "amount": i.amount
+        })
     return mode_of_payment
 
 def get_receipt(receipt_name):
