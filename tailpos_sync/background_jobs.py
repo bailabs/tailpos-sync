@@ -123,6 +123,7 @@ def _get_mode_of_payment(type, device=None):
     if device:
         return _get_device_mode_of_payment(device, type)
     mode_of_payment = []
+    print(type)
     for i in type:
         mop = frappe.get_all('Tail Settings Payment', filters={'payment_type': i.type}, fields=['mode_of_payment'])
 
