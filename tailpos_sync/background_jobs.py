@@ -42,6 +42,7 @@ def generate_si_from_receipts():
         items = get_receipt_items(receipt.name)
         receipt_info = get_receipt(receipt.name)
         customer = get_customer(receipt_info.customer)
+        debit_to = get_debit_to()
         if type:
             mop = _get_mode_of_payment(type, device=device)
 
@@ -50,7 +51,7 @@ def generate_si_from_receipts():
             'is_pos': 1,
             'pos_profile': pos_profile,
             'company': company,
-            "debit_to": "Debtors - BWAML",
+            "debit_to": debit_to,
             "due_date": receipt_info.date,
             "customer": customer.customer_name
         })
@@ -71,6 +72,8 @@ def generate_si_from_receipts():
 
 
 # Helper
+def get_debit_to():
+    return frappe.db.sql(""" SELECT name FROM `tabAccount` WHERE name like %s """, "%Debtors%")[0]
 def _insert_invoice(invoice, mop,taxes_total, submit=False,allow_negative_stock=False):
 
     invoice.insert()
