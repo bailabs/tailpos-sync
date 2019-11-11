@@ -43,7 +43,7 @@ def generate_si_from_receipts():
         receipt_info = get_receipt(receipt.name)
         customer = get_customer(receipt_info.customer)
         if type:
-            mop = _get_mode_of_payment(type[0], device=device)
+            mop = _get_mode_of_payment(type, device=device)
 
         si = frappe.get_doc({
             'doctype': 'Sales Invoice',
