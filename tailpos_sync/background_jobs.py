@@ -20,8 +20,6 @@ def generate_si_from_receipts():
     use_device_profile = frappe.db.get_single_value('Tail Settings', 'use_device_profile')
     generate_limit = frappe.db.get_single_value('Tail Settings', 'generate_limit')
     allow_negative_stock = frappe.db.get_single_value('Stock Settings', 'allow_negative_stock')
-    print("GENERAAAATE LIMIIIIT")
-    print(generate_limit)
     company = frappe.db.get_value('POS Profile', pos_profile, 'company')
 
     receipts = frappe.db.sql("""
@@ -143,6 +141,7 @@ def _get_mode_of_payment(type, device=None):
 def _get_device_mode_of_payment(device, type):
     mode_of_payment = []
     for i in type:
+        print(i)
         mop = frappe.get_all('Device Payment', filters={'parent': device, 'payment_type': i.type}, fields=['mode_of_payment'])
 
         if not mop:
@@ -169,13 +168,13 @@ def test():
     allow_negative_stock = frappe.db.get_single_value('Stock Settings', 'allow_negative_stock')
 
     company = frappe.db.get_value('POS Profile', pos_profile, 'company')
-    type = _get_receipts_payment_type("Receipt/6d34abf1-013e-11ea-88c1-35be9db41f9c")
-    items = get_receipt_items("Receipt/6d34abf1-013e-11ea-88c1-35be9db41f9c")
-    receipt_info = get_receipt("Receipt/6d34abf1-013e-11ea-88c1-35be9db41f9c")
+    type = _get_receipts_payment_type("Receipt/456a4ea0-0449-11ea-acf4-8b0cca3fbb60")
+    items = get_receipt_items("Receipt/456a4ea0-0449-11ea-acf4-8b0cca3fbb60")
+    receipt_info = get_receipt("Receipt/456a4ea0-0449-11ea-acf4-8b0cca3fbb60")
     customer = get_customer(receipt_info.customer)
     if type:
         print(type)
-        mop = _get_mode_of_payment(type, device="c9abc69240")
+        mop = _get_mode_of_payment(type, device="f2ef25d668")
 
     si = frappe.get_doc({
         'doctype': 'Sales Invoice',
