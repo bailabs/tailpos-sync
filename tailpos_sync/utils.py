@@ -137,20 +137,16 @@ def get_items_with_price_list_query(device,columns=None, pos_profile=None,):
     price_list = _get_price_list(pos_profile)
     item_group = get_device_item_group(device)
     condition = ""
-    print(item_group)
     if item_group:
         condition = "AND `tabItem`.item_group = '{0}'".format(item_group)
     columns_str = ', '.join(columns) if columns else '*'
-    print("CONDIIITIOOOOON")
-    print(condition)
     query = """
       SELECT %s FROM `tabItem` 
       INNER JOIN `tabItem Price` ON `tabItem`.name = `tabItem Price`.item_code
       LEFT JOIN `tabItem Tax` ON `tabItem`.name = `tabItem Tax`.parent
       LEFT JOIN `tabItem Tax Template Detail` ON `tabItem Tax Template Detail`.parent = `tabItem Tax`.item_tax_template
       WHERE `tabItem`.in_tailpos = 1 AND `tabItem Price`.price_list= '%s' {0} """.format(condition) % (columns_str, price_list)
-    print("QUEEEERRRYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
-    print(query)
+
     return query
 
 

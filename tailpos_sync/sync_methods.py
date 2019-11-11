@@ -163,25 +163,6 @@ def get_deleted_documents():
                 """, ('true', name))
 
     frappe.db.commit()
-
-
-    # for i in range(0, len(tables)):
-    #     data = frappe.db.sql("""SELECT data FROM `tabDeleted Document` WHERE deleted_doctype=%s""", tables[i], as_dict=True)
-    #     for row in data:
-    #         row_data = json.loads(row.data)
-    #         try:
-    #             if row_data.get('id') is not None and row.sync_status is None:
-    #                 returnArray.append({
-    #                     'tableNames': tableNames[i],
-    #                     '_id': row_data.get('id')
-    #                 })
-    #         except Exception:
-    #             print(frappe.get_traceback())
-    #         try:
-    #             frappe.db.sql("""UPDATE `tabDeleted Document` SET sync_status=%s WHERE data=%s""", ('true', row.data), as_dict=True)
-    #         except Exception:
-    #             print(frappe.get_traceback())
-
     return res
 
 
@@ -273,7 +254,7 @@ def is_deleted_record(_id, deleted_records):
     return False
 
 
-def new_doc(data, owner='Administrator'):
+def new_doc(data, device_id, owner='Administrator'):
     db_name = data['dbName']
     sync_object = data['syncObject']
 
@@ -357,11 +338,11 @@ def new_doc(data, owner='Administrator'):
         try:
             payment = frappe.get_doc(doc)
             if sync_object['type']:
+
                 for i in json.loads(sync_object['type']):
-                    print(i['type'])
-                    print(i['amount'])
+                    mop = frappe.get_all('Device Payment', filters={'parent': device_id, 'payment_type': i['type']},fields=['mode_of_payment'])
                     payment.append("payment_types", {
-                        "type": i['type'],
+                        "type": mop[0].mode_of_payment if len(mop) > 0 else frappe.get_all('Tail Settings Payment', filters={'payment_type': i['type']}, fields=['mode_of_payment'])[0].mode_of_payment,
                         "amount": i['amount'],
                     })
 

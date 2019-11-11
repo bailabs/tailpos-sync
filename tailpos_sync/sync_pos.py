@@ -45,7 +45,7 @@ def sync_data(data):
     deleted_records = get_deleted_documents()
     delete_records(trash_object)
 
-    _sync_to_erpnext(tailpos_data, deleted_records)
+    _sync_to_erpnext(tailpos_data, deleted_records,device_id)
 
     force_sync = (sync_type == "forceSync")
     erpnext_data = sync_from_erpnext(device_id, force_sync)
@@ -78,7 +78,7 @@ def check_modified(data, frappe_table):
     return update_data
 
 
-def _sync_to_erpnext(tailpos_data, deleted_records):
+def _sync_to_erpnext(tailpos_data, deleted_records,device_id):
     for row in tailpos_data:
         receipt_total = 0
 
@@ -103,7 +103,7 @@ def _sync_to_erpnext(tailpos_data, deleted_records):
             if update_data:
                 insert_data(row, frappe_table, receipt_total)
         else:
-            frappe_table = new_doc(row)
+            frappe_table = new_doc(row,device_id)
 
             try:
                 frappe_table.insert(ignore_permissions=True)
