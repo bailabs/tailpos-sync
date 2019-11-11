@@ -134,7 +134,7 @@ def _get_mode_of_payment(type, device=None):
             )
         else:
             mode_of_payment.append({
-                "mode_of_payment": i.type,
+                "mode_of_payment": mop[0].mode_of_payment,
                 "amount": i.amount
             })
     return mode_of_payment
@@ -151,7 +151,7 @@ def _get_device_mode_of_payment(device, type):
             )
         else:
             mode_of_payment.append({
-                "mode_of_payment": i.type,
+                "mode_of_payment": mop[0].mode_of_payment,
                 "amount": i.amount
             })
     return mode_of_payment
