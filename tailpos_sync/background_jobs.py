@@ -141,9 +141,8 @@ def _get_mode_of_payment(type, device=None):
 
 def _get_device_mode_of_payment(device, type):
     mode_of_payment = []
-    print(type)
     for i in type:
-        print(i)
+        print(i.type)
         mop = frappe.get_all('Device Payment', filters={'parent': device, 'payment_type': i.type}, fields=['mode_of_payment'])
 
         if not mop:
