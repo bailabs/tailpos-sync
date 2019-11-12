@@ -165,20 +165,20 @@ def get_receipt(receipt_name):
 def get_customer(id):
     return frappe.db.sql(""" SELECT * FROM tabCustomer WHERE id=%s""",id, as_dict=True)[0]
 
-def test():
+def test(receipt,device):
     pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
     submit_invoice = frappe.db.get_single_value('Tail Settings', 'submit_invoice')
 
     allow_negative_stock = frappe.db.get_single_value('Stock Settings', 'allow_negative_stock')
 
     company = frappe.db.get_value('POS Profile', pos_profile, 'company')
-    type = _get_receipts_payment_type("Receipt/456a4ea0-0449-11ea-acf4-8b0cca3fbb60")
-    items = get_receipt_items("Receipt/456a4ea0-0449-11ea-acf4-8b0cca3fbb60")
-    receipt_info = get_receipt("Receipt/456a4ea0-0449-11ea-acf4-8b0cca3fbb60")
+    type = _get_receipts_payment_type(receipt)
+    items = get_receipt_items(receipt)
+    receipt_info = get_receipt(receipt)
     customer = get_customer(receipt_info.customer)
     if type:
         print(type)
-        mop = _get_mode_of_payment(type, device="f2ef25d668")
+        mop = _get_mode_of_payment(type, device=device)
 
     si = frappe.get_doc({
         'doctype': 'Sales Invoice',
