@@ -163,6 +163,8 @@ def get_receipt(receipt_name):
     return frappe.db.sql(""" SELECT * FROM tabReceipts WHERE name=%s""",receipt_name, as_dict=True)[0]
 
 def get_customer(id):
+    print("IDDDDDDDD")
+    print(id)
     return frappe.db.sql(""" SELECT * FROM tabCustomer WHERE id=%s""",id, as_dict=True)[0]
 
 def test(receipt,device):
