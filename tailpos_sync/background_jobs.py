@@ -165,7 +165,7 @@ def get_receipt(receipt_name):
 def get_customer(id):
     print("IDDDDDDDD")
     print(id)
-    return frappe.db.sql(""" SELECT * FROM tabCustomer WHERE id=%s""",id, as_dict=True)[0]
+    return frappe.db.sql(""" SELECT * FROM tabCustomer WHERE id=%s""",id, as_dict=True)[0].name
 
 def test(receipt,device):
     pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
