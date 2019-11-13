@@ -332,6 +332,7 @@ def new_doc(data, device_id, owner='Administrator'):
             'date': get_date_fromtimestamp(sync_object['date']),
             'receipt_lines': get_receipt_lines(sync_object['lines']),
         })
+
     if db_name != "Payments":
         return frappe.get_doc(doc)
     else:
