@@ -53,7 +53,7 @@ def generate_si_from_receipts():
             'company': company,
             "debit_to": debit_to,
             "due_date": receipt_info.date,
-            "customer": customer.customer_name
+            "customer": customer
         })
 
         for item in items:
