@@ -338,11 +338,9 @@ def new_doc(data, device_id, owner='Administrator'):
         try:
             payment = frappe.get_doc(doc)
             if sync_object['type']:
-
                 for i in json.loads(sync_object['type']):
-                    mop = frappe.get_all('Device Payment', filters={'parent': device_id, 'payment_type': i['type']},fields=['mode_of_payment'])
                     payment.append("payment_types", {
-                        "type": mop[0].mode_of_payment if len(mop) > 0 else frappe.get_all('Tail Settings Payment', filters={'payment_type': i['type']}, fields=['mode_of_payment'])[0].mode_of_payment,
+                        "type": i['type'],
                         "amount": i['amount'],
                     })
 
