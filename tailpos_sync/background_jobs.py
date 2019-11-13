@@ -73,7 +73,8 @@ def generate_si_from_receipts():
 
 # Helper
 def get_debit_to():
-    return frappe.db.sql(""" SELECT name FROM `tabAccount` WHERE name like %s """, "%Debtors%")[0][0]
+    return frappe.db.sql(""" SELECT name FROM `tabAccount` WHERE name like %s """, "%Debtors%")
+
 def _insert_invoice(invoice, mop,taxes_total, submit=False,allow_negative_stock=False):
 
     invoice.insert()
