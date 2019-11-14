@@ -94,14 +94,17 @@ def _sync_to_erpnext(tailpos_data, deleted_records,device_id):
         exist = _get_doc(db_name, _id)
 
         if exist:
-            frappe_table = frappe.get_doc(db_name, exist[0]['name'])
+            try:
+                frappe_table = frappe.get_doc(db_name, exist[0]['name'])
 
-            if 'dateUpdated' in sync_object:
-                update_data = check_modified(date_updated, frappe_table)
-            else:
-                update_data = True
-            if update_data:
-                insert_data(row, frappe_table, receipt_total)
+                if 'dateUpdated' in sync_object:
+                    update_data = check_modified(date_updated, frappe_table)
+                else:
+                    update_data = True
+                if update_data:
+                    insert_data(row, frappe_table, receipt_total)
+            except:
+                print(frappe.get_traceback())
         else:
             frappe_table = new_doc(row)
 
