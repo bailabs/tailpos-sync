@@ -58,7 +58,8 @@ def get_table_select_query(table,device, force_sync=True, pos_profile=None):
 def insert_data(data, frappe_table, receipt_total):
     sync_object = data['syncObject']
     db_name = data['dbName']
-
+    print(sync_object)
+    print(db_name)
     for key, value in sync_object.iteritems():
         field_name = str(key).lower()
 
