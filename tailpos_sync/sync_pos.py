@@ -39,26 +39,25 @@ def sync_data(data):
     tailpos_data = data['tailposData']
     sync_type = data['typeOfSync']
     device_id = data['deviceId']
-    print("DATAAAAAAAAAAAA")
-    print(data)
     uom_check()
     deleted_records = get_deleted_documents()
     delete_records(trash_object)
+    try:
+        _sync_to_erpnext(tailpos_data, deleted_records,device_id)
 
-    _sync_to_erpnext(tailpos_data, deleted_records,device_id)
+        force_sync = (sync_type == "forceSync")
+        erpnext_data = sync_from_erpnext(device_id, force_sync)
 
-    force_sync = (sync_type == "forceSync")
-    erpnext_data = sync_from_erpnext(device_id, force_sync)
+        if not erpnext_data:
+            erpnext_data = ""
 
-    if not erpnext_data:
-        erpnext_data = ""
-
-    res = {
-        "data": erpnext_data,
-        "deleted_documents": deleted_records
-    }
-    print("RETURN DATA")
-    print({"data": res})
+        res = {
+            "data": erpnext_data,
+            "deleted_documents": deleted_records
+        }
+    except:
+        print("ERRRROR")
+        print(frappe.get_traceback())
     return {"data": res}
 
 
@@ -94,17 +93,14 @@ def _sync_to_erpnext(tailpos_data, deleted_records,device_id):
         exist = _get_doc(db_name, _id)
 
         if exist:
-            try:
-                frappe_table = frappe.get_doc(db_name, exist[0]['name'])
+            frappe_table = frappe.get_doc(db_name, exist[0]['name'])
 
-                if 'dateUpdated' in sync_object:
-                    update_data = check_modified(date_updated, frappe_table)
-                else:
-                    update_data = True
-                if update_data:
-                    insert_data(row, frappe_table, receipt_total)
-            except:
-                print(frappe.get_traceback())
+            if 'dateUpdated' in sync_object:
+                update_data = check_modified(date_updated, frappe_table)
+            else:
+                update_data = True
+            if update_data:
+                insert_data(row, frappe_table, receipt_total)
         else:
             frappe_table = new_doc(row)
 
