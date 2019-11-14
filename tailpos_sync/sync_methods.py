@@ -254,7 +254,8 @@ def is_deleted_record(_id, deleted_records):
     return False
 
 
-def new_doc(data, device_id, owner='Administrator'):
+def new_doc(data, owner='Administrator'):
+    print("NEW DOC")
     db_name = data['dbName']
     sync_object = data['syncObject']
 

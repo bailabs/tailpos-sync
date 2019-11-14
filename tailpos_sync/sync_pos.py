@@ -103,7 +103,7 @@ def _sync_to_erpnext(tailpos_data, deleted_records,device_id):
             if update_data:
                 insert_data(row, frappe_table, receipt_total)
         else:
-            frappe_table = new_doc(row,device_id)
+            frappe_table = new_doc(row)
 
             try:
                 frappe_table.insert(ignore_permissions=True)
