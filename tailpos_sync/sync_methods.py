@@ -60,7 +60,7 @@ def insert_data(data, frappe_table, receipt_total):
     db_name = data['dbName']
     print(sync_object)
     print(db_name)
-    for key, value in sync_object.iteritems():
+    for key, value in sync_object.items():
         field_name = str(key).lower()
 
         if field_name == "taxes":
