@@ -137,8 +137,9 @@ def get_items_with_price_list_query(device,columns=None, pos_profile=None,):
     price_list = _get_price_list(pos_profile)
     item_group = get_device_item_group(device)
     condition = ""
-    if item_group:
-        condition = "AND `tabItem`.item_group = '{0}'".format(item_group)
+    if len(item_group) > 0:
+        for i in item_group:
+            condition = "AND `tabItem`.item_group = '{0}'".format(i)
     columns_str = ', '.join(columns) if columns else '*'
     query = """
       SELECT %s FROM `tabItem` 
@@ -159,14 +160,12 @@ def _get_price_list(pos_profile):
     return price_list
 
 def get_device_item_group(device):
-    item_group = frappe.db.get_value('Device', device, 'item_group')
-    print("ITEEEEEEEEEEEEEEEEEM GROOOUUUPP")
-    print(device)
-    print(item_group)
-    if not item_group or item_group == "All Item Groups":
-        return None
-
-    return item_group
+    device_item_group = []
+    item_group = frappe.db.sql(""" SELECT item_group FROM `tabDevice Item Group` WHERE parent=%s """,(device))
+    for i in item_group:
+        print(i[0])
+        device_item_group.append(i[0])
+    return device_item_group
 # Where is this called?
 @frappe.whitelist()
 def save_item(doc, method):

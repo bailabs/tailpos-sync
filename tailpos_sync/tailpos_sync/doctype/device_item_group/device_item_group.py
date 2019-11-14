@@ -3,10 +3,8 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
-import frappe
+# import frappe
 from frappe.model.document import Document
-from tailpos_sync.utils import set_doc_id
 
-class Wallet(Document):
-	def autoname(self):
-		self.name = self.customer + "/" + self.wallet_card_number
+class DeviceItemGroup(Document):
+	pass

@@ -42,22 +42,19 @@ def sync_data(data):
     uom_check()
     deleted_records = get_deleted_documents()
     delete_records(trash_object)
-    try:
-        _sync_to_erpnext(tailpos_data, deleted_records,device_id)
 
-        force_sync = (sync_type == "forceSync")
-        erpnext_data = sync_from_erpnext(device_id, force_sync)
+    _sync_to_erpnext(tailpos_data, deleted_records,device_id)
 
-        if not erpnext_data:
-            erpnext_data = ""
+    force_sync = (sync_type == "forceSync")
+    erpnext_data = sync_from_erpnext(device_id, force_sync)
 
-        res = {
-            "data": erpnext_data,
-            "deleted_documents": deleted_records
-        }
-    except:
-        print("ERRRROR")
-        print(frappe.get_traceback())
+    if not erpnext_data:
+        erpnext_data = ""
+
+    res = {
+        "data": erpnext_data,
+        "deleted_documents": deleted_records
+    }
     return {"data": res}
 
 

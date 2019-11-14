@@ -9,28 +9,49 @@ def validate_customer_wallet(data):
     device = data['device_id'] #DEVICE ID FROM TAILPOS
     receipt_total = get_receipt_total(receipt) #GET RECEIPT TOTAL
     balances = get_wallet(wallet_data) #BALANCE BEFORE DEDUCTIONS
-    update_wallet = update_wallet_card(wallet_data,receipt_total) #UPDATE WALLET
+    update_wallet = update_wallet_card(receipt_total,balances) #UPDATE WALLET
     create_wallet_logs(wallet_data,update_wallet,receipt,balances,device) #CREATE WALLET LOGS
 
     return {"message": update_wallet[0], "failed": update_wallet[1] }
 
-def update_wallet_card(wallet_data,receipt_total):
-    wallet_record = get_wallet(wallet_data)
-    if len(wallet_record) > 0:
-        new_prepaid = wallet_record[0].prepaid_balance
-        new_credit = wallet_record[0].credit_limit
-        if new_prepaid >= receipt_total:
-            new_prepaid = new_prepaid - receipt_total
-        elif new_credit >= receipt_total:
-            new_credit = new_credit - receipt_total
+#UPDATE WALLET FROM RECEIPT TOTAL
+def test():
+    balances = get_wallet("9AF076DF")
+    print(update_wallet_card(10000,balances))
+def update_wallet_card(receipt_total,balances):
+
+    if len(balances) > 0:
+        customer_data = get_customer_credit(balances[0])
+        print(customer_data['credit_limit'] + (customer_data['total_prepaid_balance'] - receipt_total))
+        print(customer_data['total_prepaid_balance'] - receipt_total)
+        if customer_data['credit_limit'] + (customer_data['total_prepaid_balance'] - receipt_total) >= 0:
+            new_prepaid = (customer_data['total_prepaid_balance'] - receipt_total )
         else:
             return "Insufficient Balance", True
-        frappe.db.sql(""" UPDATE `tabWallet` SET prepaid_balance=%s, credit_limit=%s WHERE name=%s""",
-                      (new_prepaid, new_credit, wallet_record[0].name))
+
+        frappe.db.sql(""" UPDATE `tabWallet` SET prepaid_balance=%s WHERE name=%s""",
+                      (new_prepaid, balances[0].name))
+        update_customer_credit(balances[0].customer)
         return "Wallet Transaction Complete", False
     else:
         return "Wallet does not exist", True
+#UPDATE CUSTOMER CREDIT
+@frappe.whitelist()
+def update_customer_credit(wallet_customer_name):
+    total = frappe.db.sql("""SELECT SUM(prepaid_balance), company FROM tabWallet WHERE customer=%s""", wallet_customer_name)
+    frappe.db.sql(""" UPDATE `tabCustomer Credit Limit` SET total_prepaid_balance=%s """, total[0][0])
+    frappe.db.commit()
+    return True
 
+#GET CUSTOMER CREDIT
+def get_customer_credit(wallet):
+    customer = frappe.get_doc("Customer", wallet.customer)
+    for i in customer.credit_limits:
+        if i.company == wallet.company:
+            print(i.__dict__['credit_limit'])
+            print(i.__dict__['total_prepaid_balance'])
+            return i.__dict__
+#GET RECEIPT TOTAL
 def get_receipt_total(receipt):
     total_amount = 0
     for i in receipt['lines']:
@@ -38,9 +59,11 @@ def get_receipt_total(receipt):
 
     return total_amount
 
+#GET WALLET RECORD
 def get_wallet(wallet_data):
     return frappe.db.sql(""" SELECT * FROM `tabWallet` WHERE wallet_card_number=%s""", wallet_data ,as_dict=True)
 
+#CREATE WALLET LOGS
 def create_wallet_logs(wallet_data,update_wallet,receipt,balances,device):
     if not update_wallet[1]:
         update_wallet = get_wallet(wallet_data)

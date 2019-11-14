@@ -6,8 +6,8 @@
  "field_order": [
   "device_name",
   "pos_profile",
-  "column_break_3",
-  "item_group",
+  "item_group_device",
+  "device_item_group",
   "mode_of_payment_section",
   "cash_mop",
   "card_mop",
@@ -52,17 +52,17 @@
    "options": "Device Payment"
   },
   {
-   "fieldname": "column_break_3",
-   "fieldtype": "Column Break"
+   "fieldname": "item_group_device",
+   "fieldtype": "Section Break"
   },
   {
-   "fieldname": "item_group",
-   "fieldtype": "Link",
-   "label": "Item Group",
-   "options": "Item Group"
+   "fieldname": "device_item_group",
+   "fieldtype": "Table",
+   "label": "Device Item Group",
+   "options": "Device Item Group"
   }
  ],
- "modified": "2019-10-25 16:40:58.757328",
+ "modified": "2019-11-13 15:39:18.414978",
  "modified_by": "Administrator",
  "module": "TailPOS Sync",
  "name": "Device",
