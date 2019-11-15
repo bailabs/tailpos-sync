@@ -176,11 +176,12 @@ def test(receipt,device):
 
     allow_negative_stock = frappe.db.get_single_value('Stock Settings', 'allow_negative_stock')
 
+    customer = frappe.db.get_value('POS Profile', pos_profile, 'customer')
+
     company = frappe.db.get_value('POS Profile', pos_profile, 'company')
     type = _get_receipts_payment_type(receipt)
     items = get_receipt_items(receipt)
     receipt_info = get_receipt(receipt)
-    customer = get_customer(receipt_info.customer)
     if type:
         print(type)
         mop = _get_mode_of_payment(type, device=device)
