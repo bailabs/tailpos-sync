@@ -193,7 +193,7 @@ def test(receipt,device):
         'company': company,
         "debit_to": "Debtors - BWAML",
         "due_date": receipt_info.date,
-        "customer": customer.customer_name
+        "customer": customer
     })
 
     for item in items:
