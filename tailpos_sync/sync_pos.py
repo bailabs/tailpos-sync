@@ -55,11 +55,12 @@ def sync_data(data):
             "data": erpnext_data,
             "deleted_documents": deleted_records
         }
+
+        return {"data": res}
     except:
         print("ERRRROR")
         print(frappe.get_traceback())
-    return {"data": res}
-
+        frappe.log_error(frappe.get_traceback(), 'sync failed')
 
 def check_modified(data, frappe_table):
     date_from_pos = datetime.datetime.fromtimestamp(data / 1000.0)

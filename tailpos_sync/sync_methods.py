@@ -58,8 +58,6 @@ def get_table_select_query(table,device, force_sync=True, pos_profile=None):
 def insert_data(data, frappe_table, receipt_total):
     sync_object = data['syncObject']
     db_name = data['dbName']
-    print(sync_object)
-    print(db_name)
     for key, value in sync_object.items():
         field_name = str(key).lower()
 
@@ -109,7 +107,8 @@ def insert_data(data, frappe_table, receipt_total):
             frappe_table.db_set("type", "Fix Discount")
 
         if value == "percentage":
-            frappe_table.db_set("type", "Percentage")
+            print(db_name)
+            frappe_table.db_set("discountType", "Percentage")
 
         if field_name == "date":
             if value:
@@ -256,7 +255,6 @@ def is_deleted_record(_id, deleted_records):
 
 
 def new_doc(data, owner='Administrator'):
-    print("NEW DOC")
     db_name = data['dbName']
     sync_object = data['syncObject']
 
@@ -313,6 +311,9 @@ def new_doc(data, owner='Administrator'):
         })
 
     elif db_name == 'Payments':
+        print("PAYMENT")
+        print(sync_object)
+        print(sync_object['type'])
         doc.update({
             'paid': sync_object['paid'],
             'receipt': sync_object['receipt'],
