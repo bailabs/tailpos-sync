@@ -191,7 +191,7 @@ def test(receipt,device):
         'is_pos': 1,
         'pos_profile': pos_profile,
         'company': company,
-        "debit_to": "Debtors - BWAML",
+        "debit_to": get_debit_to(),
         "due_date": receipt_info.date,
         "customer": customer
     })
