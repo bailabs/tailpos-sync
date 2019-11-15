@@ -3,6 +3,7 @@ import datetime
 
 @frappe.whitelist()
 def validate_customer_wallet(data):
+    print("SAMOAAAAAAAAAAAAAAAA")
     try:
         wallet_data = data['wallet'] #WALLET DATA FROM TAILPOS
         receipt = data['receipt'] #RECEIPT RECORD FROM TAILPOS
@@ -12,6 +13,7 @@ def validate_customer_wallet(data):
         update_wallet = update_wallet_card(receipt_total,balances) #UPDATE WALLET
         create_wallet_logs(wallet_data,update_wallet,receipt,balances,device) #CREATE WALLET LOGS
     except:
+        print(frappe.get_traceback())
         frappe.log_error(frappe.get_traceback(), 'sync failed')
 
     return {"message": update_wallet[0], "failed": update_wallet[1] }
@@ -24,8 +26,6 @@ def update_wallet_card(receipt_total,balances):
 
     if len(balances) > 0:
         customer_data = get_customer_credit(balances[0])
-        print(customer_data['credit_limit'] + (customer_data['total_prepaid_balance'] - receipt_total))
-        print(customer_data['total_prepaid_balance'] - receipt_total)
         if customer_data['credit_limit'] + (customer_data['total_prepaid_balance'] - receipt_total) >= 0:
             new_prepaid = (customer_data['total_prepaid_balance'] - receipt_total )
         else:
