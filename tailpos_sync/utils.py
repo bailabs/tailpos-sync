@@ -127,7 +127,6 @@ def get_receipt_items(receipt):
     fields = ['item', 'price', 'qty']
     return frappe.get_all('Receipts Item', filters={'parent': receipt}, fields=fields)
 
-
 def get_items_with_price_list_query(device,columns=None, pos_profile=None,):
 
     if not pos_profile:
@@ -138,8 +137,11 @@ def get_items_with_price_list_query(device,columns=None, pos_profile=None,):
     item_group = get_device_item_group(device)
     condition = ""
     if len(item_group) > 0:
-        for i in item_group:
-            condition = "AND `tabItem`.item_group = '{0}'".format(i)
+        condition += "AND "
+        for idx,i in enumerate(item_group):
+            condition += "`tabItem`.item_group = '{0}' ".format(i)
+            if int(idx) < int(len(item_group) - 1):
+                condition += "OR"
     columns_str = ', '.join(columns) if columns else '*'
     query = """
       SELECT %s FROM `tabItem` 

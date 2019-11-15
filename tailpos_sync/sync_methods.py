@@ -38,12 +38,14 @@ def get_item_query(pos_profile,device):
 
     return get_items_with_price_list_query(device,columns, pos_profile)
 
-
+# def test():
+#     pos_profile = frappe.db.get_value('Device', "f2ef25d668", 'pos_profile')
+#     get_table_select_query("Item", "f2ef25d668", True, pos_profile)
 def get_table_select_query(table,device, force_sync=True, pos_profile=None):
     query = "SELECT * FROM `tab{0}`".format(table)
     if table == 'Item':
         query = get_item_query(pos_profile,device)
-
+    print(query)
     if not force_sync:
         connector = " AND " if "WHERE" in query else " WHERE "
         if table == "Item":
