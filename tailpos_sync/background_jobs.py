@@ -48,6 +48,8 @@ def generate_si_from_receipts():
         if len(type) > 0:
             mop = _get_mode_of_payment(type, device=device)
 
+        customer_name = frappe.db.get_value('Customer', customer, 'customer_name')
+
         si = frappe.get_doc({
             'doctype': 'Sales Invoice',
             'is_pos': 1,
@@ -55,7 +57,9 @@ def generate_si_from_receipts():
             'company': company,
             "debit_to": debit_to,
             "due_date": receipt_info.date,
-            "customer": customer
+            "customer": customer,
+            "customer_name": customer_name,
+            "title": customer_name
         })
 
         for item in items:
@@ -65,7 +69,7 @@ def generate_si_from_receipts():
                 'qty': item['qty']
             })
 
-        _insert_invoice(si, mop, receipt_info.taxesvalue, submit_invoice,allow_negative_stock)
+        _insert_invoice(si, mop, receipt_info.taxesvalue, submit_invoice, allow_negative_stock)
 
         # ticked `Generated Sales Invoice`
         frappe.db.set_value('Receipts', receipt.name, 'generated', 1)
@@ -77,8 +81,8 @@ def generate_si_from_receipts():
 def get_debit_to():
     return frappe.db.sql(""" SELECT name FROM `tabAccount` WHERE name like %s """, "%Debtors%")[0][0]
 
-def _insert_invoice(invoice, mop,taxes_total, submit=False,allow_negative_stock=False):
-    print(mop)
+
+def _insert_invoice(invoice, mop, taxes_total, submit=False, allow_negative_stock=False):
     invoice.insert()
     if len(mop) > 0:
         for x in mop:
@@ -165,11 +169,14 @@ def _get_device_mode_of_payment(device, type):
             })
     return mode_of_payment
 
+
 def get_receipt(receipt_name):
     return frappe.db.sql(""" SELECT * FROM tabReceipts WHERE name=%s""",receipt_name, as_dict=True)[0]
 
+
 def get_customer(id):
     return frappe.db.sql(""" SELECT * FROM tabCustomer WHERE id=%s""",id, as_dict=True)[0].name
+
 
 def test(receipt,device):
     pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
