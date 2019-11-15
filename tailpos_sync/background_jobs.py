@@ -137,7 +137,7 @@ def _get_mode_of_payment(type, device=None):
                 _('Set the mode of payment for {} in Tail Settings'.format(i.type))
             )
         else:
-            mop.append({
+            mode_of_payment.append({
                 "mode_of_payment": mop[0].mode_of_payment,
                 "amount": i.amount
             })
@@ -159,7 +159,7 @@ def _get_device_mode_of_payment(device, type):
                 "mode_of_payment": mop[0].mode_of_payment,
                 "amount": i.amount
             })
-            mop.append({
+            mode_of_payment.append({
                 "mode_of_payment": mop[0].mode_of_payment,
                 "amount": i.amount
             })
