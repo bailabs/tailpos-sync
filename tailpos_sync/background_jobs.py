@@ -32,16 +32,18 @@ def generate_si_from_receipts():
     for receipt in receipts:
         device = None
         mop = 'Cash'
-
+        customer = ""
         if use_device_profile:
             device = frappe.db.get_value('Receipts', receipt.name, 'deviceid')
             pos_profile = _get_device_pos_profile(device)
             company = frappe.db.get_value('POS Profile', pos_profile, 'company')
+            customer = frappe.db.get_value('POS Profile', pos_profile, 'customer')
 
         type = _get_receipts_payment_type(receipt.name)
         items = get_receipt_items(receipt.name)
         receipt_info = get_receipt(receipt.name)
-        customer = get_customer(receipt_info.customer)
+        if not customer:
+            customer = get_customer(receipt_info.customer)
         debit_to = get_debit_to()
         if type:
             mop = _get_mode_of_payment(type, device=device)
@@ -152,6 +154,10 @@ def _get_device_mode_of_payment(device, type):
                 _('Set the device mode of payment for {} in device {}'.format(type,device))
             )
         else:
+            print({
+                "mode_of_payment": mop[0].mode_of_payment,
+                "amount": i.amount
+            })
             mop.append({
                 "mode_of_payment": mop[0].mode_of_payment,
                 "amount": i.amount
@@ -162,8 +168,6 @@ def get_receipt(receipt_name):
     return frappe.db.sql(""" SELECT * FROM tabReceipts WHERE name=%s""",receipt_name, as_dict=True)[0]
 
 def get_customer(id):
-    print("IDDDDDDDD")
-    print(id)
     return frappe.db.sql(""" SELECT * FROM tabCustomer WHERE id=%s""",id, as_dict=True)[0].name
 
 def test(receipt,device):
