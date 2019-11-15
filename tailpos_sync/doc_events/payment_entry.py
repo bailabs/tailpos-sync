@@ -20,7 +20,7 @@ def get_current_balance(doc):
 
 @frappe.whitelist()
 def get_wallet_account():
-    wallet = frappe.db.sql(""" SELECT name FROM `tabAccount` WHERE name like %s """, "%Wallet%")[0]
+    wallet = frappe.db.sql(""" SELECT name FROM `tabAccount` WHERE name like %s """, "%Wallet%")
     if len(wallet) > 0:
         return wallet[0]
     else:
