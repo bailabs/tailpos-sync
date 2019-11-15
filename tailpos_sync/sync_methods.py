@@ -251,7 +251,7 @@ def delete_records(data):
 
 def is_deleted_record(_id, deleted_records):
     for deleted_record in deleted_records:
-        if deleted_record('_id') == _id:
+        if deleted_record.get('_id') == _id:
             return True
     return False
 
