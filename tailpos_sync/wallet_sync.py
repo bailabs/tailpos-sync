@@ -3,14 +3,16 @@ import datetime
 
 @frappe.whitelist()
 def validate_customer_wallet(data):
-
-    wallet_data = data['wallet'] #WALLET DATA FROM TAILPOS
-    receipt = data['receipt'] #RECEIPT RECORD FROM TAILPOS
-    device = data['device_id'] #DEVICE ID FROM TAILPOS
-    receipt_total = get_receipt_total(receipt) #GET RECEIPT TOTAL
-    balances = get_wallet(wallet_data) #BALANCE BEFORE DEDUCTIONS
-    update_wallet = update_wallet_card(receipt_total,balances) #UPDATE WALLET
-    create_wallet_logs(wallet_data,update_wallet,receipt,balances,device) #CREATE WALLET LOGS
+    try:
+        wallet_data = data['wallet'] #WALLET DATA FROM TAILPOS
+        receipt = data['receipt'] #RECEIPT RECORD FROM TAILPOS
+        device = data['device_id'] #DEVICE ID FROM TAILPOS
+        receipt_total = get_receipt_total(receipt) #GET RECEIPT TOTAL
+        balances = get_wallet(wallet_data) #BALANCE BEFORE DEDUCTIONS
+        update_wallet = update_wallet_card(receipt_total,balances) #UPDATE WALLET
+        create_wallet_logs(wallet_data,update_wallet,receipt,balances,device) #CREATE WALLET LOGS
+    except:
+        frappe.log_error(frappe.get_traceback(), 'sync failed')
 
     return {"message": update_wallet[0], "failed": update_wallet[1] }
 
