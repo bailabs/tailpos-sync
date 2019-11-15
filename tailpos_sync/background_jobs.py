@@ -45,7 +45,7 @@ def generate_si_from_receipts():
         if not customer:
             customer = get_customer(receipt_info.customer)
         debit_to = get_debit_to()
-        if type:
+        if len(type) > 0:
             mop = _get_mode_of_payment(type, device=device)
 
         si = frappe.get_doc({
@@ -154,6 +154,7 @@ def _get_device_mode_of_payment(device, type):
                 _('Set the device mode of payment for {} in device {}'.format(type,device))
             )
         else:
+            print("DEVIIIIIIIIIICE")
             print({
                 "mode_of_payment": mop[0].mode_of_payment,
                 "amount": i.amount
