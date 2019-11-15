@@ -13,8 +13,7 @@ def validate_customer_wallet(data):
         update_wallet = update_wallet_card(receipt_total,balances) #UPDATE WALLET
         create_wallet_logs(wallet_data,update_wallet,receipt,balances,device) #CREATE WALLET LOGS
     except:
-        print(frappe.get_traceback())
-        frappe.log_error(frappe.get_traceback(), 'sync failed')
+        frappe.log_error(frappe.get_traceback(), 'Wallet Transaction Failed')
 
     return {"message": update_wallet[0], "failed": update_wallet[1] }
 
@@ -40,19 +39,24 @@ def update_wallet_card(receipt_total,balances):
 #UPDATE CUSTOMER CREDIT
 @frappe.whitelist()
 def update_customer_credit(wallet_customer_name):
+    print(wallet_customer_name)
     total = frappe.db.sql("""SELECT SUM(prepaid_balance), company FROM tabWallet WHERE customer=%s""", wallet_customer_name)
-    frappe.db.sql(""" UPDATE `tabCustomer Credit Limit` SET total_prepaid_balance=%s """, total[0][0])
+    print(total)
+    frappe.db.sql(""" UPDATE `tabCustomer Credit Limit` SET total_prepaid_balance=%s WHERE parent=%s """, (total[0][0],wallet_customer_name ))
     frappe.db.commit()
     return True
 
 #GET CUSTOMER CREDIT
 def get_customer_credit(wallet):
     customer = frappe.get_doc("Customer", wallet.customer)
-    for i in customer.credit_limits:
-        if i.company == wallet.company:
-            print(i.__dict__['credit_limit'])
-            print(i.__dict__['total_prepaid_balance'])
-            return i.__dict__
+    if customer.__dict__:
+        for i in customer.credit_limits:
+            if i.company == wallet.company:
+                print(i.__dict__['credit_limit'])
+                print(i.__dict__['total_prepaid_balance'])
+                return i.__dict__
+        else:
+            frappe.log_error("Please Setup Customer Credit Limit", 'Wallet Transaction Failed')
 #GET RECEIPT TOTAL
 def get_receipt_total(receipt):
     total_amount = 0
