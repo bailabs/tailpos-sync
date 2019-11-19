@@ -180,8 +180,7 @@ def get_customer(id):
 
 
 def test(receipt,device):
-
-    pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
+    pos_profile = _get_device_pos_profile(device)
     submit_invoice = frappe.db.get_single_value('Tail Settings', 'submit_invoice')
 
     allow_negative_stock = frappe.db.get_single_value('Stock Settings', 'allow_negative_stock')
