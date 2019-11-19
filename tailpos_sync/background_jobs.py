@@ -38,7 +38,7 @@ def generate_si_from_receipts():
             pos_profile = _get_device_pos_profile(device)
             company = frappe.db.get_value('POS Profile', pos_profile, 'company')
             customer = frappe.db.get_value('POS Profile', pos_profile, 'customer')
-
+        print(device)
         type = _get_receipts_payment_type(receipt.name)
         items = get_receipt_items(receipt.name)
         receipt_info = get_receipt(receipt.name)
