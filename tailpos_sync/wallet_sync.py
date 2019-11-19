@@ -1,43 +1,55 @@
 import frappe
 import datetime
-
+import json
 @frappe.whitelist()
 def validate_if_customer_wallet_exists(data):
+    print("CUSTOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOMER")
+
     wallet_card_number = data['wallet_card_number']
     receipt = data['receipt']
     wallet_data = get_wallet(wallet_card_number)
     if len(wallet_data) > 0:
         customer_data = get_customer_credit(wallet_data[0])
-        if customer_data['credit_limit'] + (customer_data['total_prepaid_balance'] - get_receipt_total(receipt)) >= 0:
-            return "Wallet exists", False
+        print(customer_data)
+        if customer_data and customer_data['credit_limit']:
+            if customer_data['credit_limit'] + (customer_data['total_prepaid_balance'] - get_receipt_total(receipt)) >= 0:
+                return {"message": "Customer Wallet exists. Ready to validate wallet. Please scan assigned person wallet ", "failed": False}
+            else:
+                return {"message": "Insufficient Balance", "failed": True}
         else:
-            return "Insufficient Balance", True
-
-    return "Wallet does not exist", True
+            return {"message": "Please set up credit limit in ERPNext","failed": True}
+    else:
+        frappe.log_error("Customer Wallet does not exist")
+        return {"message": "Customer Wallet does not exist", "failed": True}
 
 @frappe.whitelist()
 def validate_if_attendant_wallet_exists(data):
     wallet_card_number = data['wallet_card_number']
-    attendant = frappe.db.sql(""" SELECT * FROM `tabAttendant` WHERE wallet_card_number=%s""", wallet_card_number)
+    print(wallet_card_number)
+    attendant = frappe.db.sql(""" SELECT * FROM `tabAttendants` WHERE card_number=%s""", wallet_card_number)
     if len(attendant) > 0:
         return {"message": "Attendant wallet exists", "failed": False}
+    frappe.log_error("Attendant wallet does not exists")
     return {"message": "Attendant wallet does not exists", "failed": True}
 
 @frappe.whitelist()
-def validate_customer_wallet(data):
-
+def validate_wallet(data):
+    print(data)
+    print(json.loads(data['wallet'])['customer'])
     try:
-        wallet_data = data['wallet_card_number'] #WALLET DATA FROM TAILPOS
+        customer = json.loads(data['wallet'])['customer'] #CUSTOMER WALLET DATA FROM TAILPOS
+        attendant = json.loads(data['wallet'])['attendant'] #ATTENDANT WALLET DATA FROM TAILPOS
         receipt = data['receipt'] #RECEIPT RECORD FROM TAILPOS
         device = data['device_id'] #DEVICE ID FROM TAILPOS
         receipt_total = get_receipt_total(receipt) #GET RECEIPT TOTAL
-        balances = get_wallet(wallet_data) #BALANCE BEFORE DEDUCTIONS
+        balances = get_wallet(customer) #BALANCE BEFORE DEDUCTIONS
         update_wallet = update_wallet_card(receipt_total,balances) #UPDATE WALLET
-        create_wallet_logs(wallet_data,update_wallet,receipt,balances,device) #CREATE WALLET LOGS
+        create_wallet_logs(customer,update_wallet,receipt,balances,device,attendant) #CREATE WALLET LOGS
+        return {"message": update_wallet[0], "failed": update_wallet[1]}
     except:
         frappe.log_error(frappe.get_traceback(), 'Wallet Transaction Failed')
 
-    return {"message": update_wallet[0], "failed": update_wallet[1] }
+
 
 #UPDATE WALLET FROM RECEIPT TOTAL
 def test():
@@ -78,8 +90,8 @@ def get_customer_credit(wallet):
                 print(i.__dict__['credit_limit'])
                 print(i.__dict__['total_prepaid_balance'])
                 return i.__dict__
-        else:
-            frappe.log_error("Please Setup Customer Credit Limit", 'Wallet Transaction Failed')
+    else:
+        frappe.log_error("Please Setup Customer Credit Limit", 'Wallet Transaction Failed')
 #GET RECEIPT TOTAL
 def get_receipt_total(receipt):
     total_amount = 0
@@ -93,10 +105,10 @@ def get_wallet(wallet_data):
     return frappe.db.sql(""" SELECT * FROM `tabWallet` WHERE wallet_card_number=%s""", wallet_data ,as_dict=True)
 
 #CREATE WALLET LOGS
-def create_wallet_logs(wallet_data,update_wallet,receipt,balances,device):
+def create_wallet_logs(wallet_data,update_wallet,receipt,balances,device,attendant):
     if not update_wallet[1]:
         update_wallet = get_wallet(wallet_data)
-
+        attendant_name = get_attendant(attendant)
         try:
             doc = {
                 "doctype": "Wallet Logs",
@@ -107,9 +119,12 @@ def create_wallet_logs(wallet_data,update_wallet,receipt,balances,device):
                 "amount": get_receipt_total(receipt),
                 "prepaid_after_before_deduction": update_wallet[0].prepaid_balance,
                 "credit_balance_after_deduction": update_wallet[0].credit_limit,
-                "attendant": receipt['attendant'],
+                "attendant": attendant_name,
                 "device": device,
             }
             frappe.get_doc(doc).insert(ignore_permissions=True)
         except:
             print(frappe.get_traceback())
+
+def get_attendant(attendant):
+    return frappe.db.sql(""" SELECT user_name FROM `tabAttendants` WHERE card_number=%s """, attendant)[0][0]
