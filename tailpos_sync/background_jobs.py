@@ -30,11 +30,15 @@ def generate_si_from_receipts():
     # receipts = frappe.get_all('Receipts', filters={'generated': 0})
 
     for receipt in receipts:
-        device = None
+        device = frappe.db.get_value('Receipts', receipt.name, 'deviceid')
         mop = 'Cash'
         customer = ""
+
+        if not get_device(device):
+            device = None
+
         if use_device_profile:
-            device = frappe.db.get_value('Receipts', receipt.name, 'deviceid')
+
             pos_profile = _get_device_pos_profile(device)
             company = frappe.db.get_value('POS Profile', pos_profile, 'company')
             customer = frappe.db.get_value('POS Profile', pos_profile, 'customer')
@@ -116,7 +120,11 @@ def _insert_invoice(invoice, mop, taxes_total, submit=False, allow_negative_stoc
         frappe.db.set_value("Sales Invoice", invoice.name, "in_words", money_in_words(round(float(invoice.grand_total) + float(taxes_total)), invoice.currency))
         frappe.db.commit()
 
-
+def get_device(device):
+    device_data = frappe.db.sql(""" SELECT * FROM `tabDevice` WHERE name=%s """, device)
+    if len(device_data) > 0:
+        return True
+    return False
 def _check_items_zero_qty(items):
     for item in items:
         if item.actual_qty <= 0:
