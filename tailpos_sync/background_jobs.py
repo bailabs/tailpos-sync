@@ -156,7 +156,7 @@ def _get_device_mode_of_payment(device, type):
 
         if not mop:
             frappe.throw(
-                _('Set the device mode of payment for {} in device {}'.format(type,device))
+                _('Set the device mode of payment for {} in device {}'.format(i.type,device))
             )
         else:
             print("DEVIIIIIIIIIICE")
@@ -180,6 +180,7 @@ def get_customer(id):
 
 
 def test(receipt,device):
+
     pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
     submit_invoice = frappe.db.get_single_value('Tail Settings', 'submit_invoice')
 
@@ -188,6 +189,8 @@ def test(receipt,device):
     customer = frappe.db.get_value('POS Profile', pos_profile, 'customer')
 
     company = frappe.db.get_value('POS Profile', pos_profile, 'company')
+    print(company)
+    print(get_debit_to(company))
     type = _get_receipts_payment_type(receipt)
     items = get_receipt_items(receipt)
     receipt_info = get_receipt(receipt)
