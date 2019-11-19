@@ -313,9 +313,6 @@ def new_doc(data, owner='Administrator'):
         })
 
     elif db_name == 'Payments':
-        print("PAYMENT")
-        print(sync_object)
-        print(sync_object['type'])
         doc.update({
             'paid': sync_object['paid'],
             'receipt': sync_object['receipt'],

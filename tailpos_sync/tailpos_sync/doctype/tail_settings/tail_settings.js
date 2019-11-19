@@ -6,3 +6,10 @@ frappe.ui.form.on('Tail Settings', {
 
 	}
 });
+cur_frm.cscript.update_items_with_no_tailpos_id = function () {
+
+	frappe.call({
+		method: "tailpos_sync.doc_events.item.save_no_id",
+	})
+
+}

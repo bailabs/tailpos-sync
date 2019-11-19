@@ -2,10 +2,32 @@ import frappe
 import datetime
 
 @frappe.whitelist()
+def validate_if_customer_wallet_exists(data):
+    wallet_card_number = data['wallet_card_number']
+    receipt = data['receipt']
+    wallet_data = get_wallet(wallet_card_number)
+    if len(wallet_data) > 0:
+        customer_data = get_customer_credit(wallet_data[0])
+        if customer_data['credit_limit'] + (customer_data['total_prepaid_balance'] - get_receipt_total(receipt)) >= 0:
+            return "Wallet exists", False
+        else:
+            return "Insufficient Balance", True
+
+    return "Wallet does not exist", True
+
+@frappe.whitelist()
+def validate_if_attendant_wallet_exists(data):
+    wallet_card_number = data['wallet_card_number']
+    attendant = frappe.db.sql(""" SELECT * FROM `tabAttendant` WHERE wallet_card_number=%s""", wallet_card_number)
+    if len(attendant) > 0:
+        return {"message": "Attendant wallet exists", "failed": False}
+    return {"message": "Attendant wallet does not exists", "failed": True}
+
+@frappe.whitelist()
 def validate_customer_wallet(data):
-    print("SAMOAAAAAAAAAAAAAAAA")
+
     try:
-        wallet_data = data['wallet'] #WALLET DATA FROM TAILPOS
+        wallet_data = data['wallet_card_number'] #WALLET DATA FROM TAILPOS
         receipt = data['receipt'] #RECEIPT RECORD FROM TAILPOS
         device = data['device_id'] #DEVICE ID FROM TAILPOS
         receipt_total = get_receipt_total(receipt) #GET RECEIPT TOTAL
@@ -21,6 +43,7 @@ def validate_customer_wallet(data):
 def test():
     balances = get_wallet("9AF076DF")
     print(update_wallet_card(10000,balances))
+
 def update_wallet_card(receipt_total,balances):
 
     if len(balances) > 0:
@@ -73,8 +96,7 @@ def get_wallet(wallet_data):
 def create_wallet_logs(wallet_data,update_wallet,receipt,balances,device):
     if not update_wallet[1]:
         update_wallet = get_wallet(wallet_data)
-        print("ADDING WALLET LOGS....")
-        print(receipt['date'])
+
         try:
             doc = {
                 "doctype": "Wallet Logs",

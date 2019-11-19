@@ -137,11 +137,12 @@ def get_items_with_price_list_query(device,columns=None, pos_profile=None,):
     item_group = get_device_item_group(device)
     condition = ""
     if len(item_group) > 0:
-        condition += "AND "
+        condition += "AND ("
         for idx,i in enumerate(item_group):
             condition += "`tabItem`.item_group = '{0}' ".format(i)
             if int(idx) < int(len(item_group) - 1):
                 condition += "OR"
+        condition += ")"
     columns_str = ', '.join(columns) if columns else '*'
     query = """
       SELECT %s FROM `tabItem` 
@@ -151,6 +152,7 @@ def get_items_with_price_list_query(device,columns=None, pos_profile=None,):
       WHERE `tabItem`.in_tailpos = 1 AND `tabItem Price`.price_list= '%s' {0} """.format(condition) % (columns_str, price_list)
 
     return query
+
 
 
 def _get_price_list(pos_profile):
