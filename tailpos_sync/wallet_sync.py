@@ -10,15 +10,14 @@ def check_customers_pin(data):
         wallet_data = get_wallet(wallet_card_number)
 
         if len(wallet_data) > 0:
-            customer = get_customer(wallet_data[0].customer)
-            return compare_customers_pin(customers_pin,customer)
+            return compare_customers_pin(customers_pin, wallet_data)
     except:
         print(frappe.get_traceback())
-def compare_customers_pin(customers_pin,customer):
+def compare_customers_pin(customers_pin, wallet_data):
     failed_message = {"message": "Invalid Customers Pin" , "failed": True}
     success_message = {"message": "Valid Customers Pin. You can now proceed to wallet validation", "failed": False}
 
-    return success_message if customers_pin == customer[0].customer_pin else failed_message
+    return success_message if customers_pin == wallet_data[0].customer_pin else failed_message
 
 @frappe.whitelist()
 def validate_if_customer_wallet_exists(data):
