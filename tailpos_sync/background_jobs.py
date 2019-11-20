@@ -20,7 +20,9 @@ def generate_si_from_receipts():
     use_device_profile = frappe.db.get_single_value('Tail Settings', 'use_device_profile')
     generate_limit = frappe.db.get_single_value('Tail Settings', 'generate_limit')
     allow_negative_stock = frappe.db.get_single_value('Stock Settings', 'allow_negative_stock')
+
     company = frappe.db.get_value('POS Profile', pos_profile, 'company')
+    customer = frappe.db.get_value('POS Profile', pos_profile, 'customer')
 
     receipts = frappe.db.sql("""
         SELECT name FROM `tabReceipts`
@@ -32,27 +34,36 @@ def generate_si_from_receipts():
     for receipt in receipts:
         device = frappe.db.get_value('Receipts', receipt.name, 'deviceid')
         mop = 'Cash'
-        customer = ""
+
+        receipt_customer = None
 
         if not get_device(device):
             device = None
 
         if use_device_profile:
-
             pos_profile = _get_device_pos_profile(device)
             company = frappe.db.get_value('POS Profile', pos_profile, 'company')
-            customer = frappe.db.get_value('POS Profile', pos_profile, 'customer')
+            receipt_customer = frappe.db.get_value('POS Profile', pos_profile, 'customer')
+
+        customer_name = frappe.db.get_value(
+            'Customer',
+            receipt_customer or customer,
+            'customer_name'
+        )
+
         print(device)
+
         type = _get_receipts_payment_type(receipt.name)
         items = get_receipt_items(receipt.name)
         receipt_info = get_receipt(receipt.name)
-        if not customer:
-            customer = get_customer(receipt_info.customer)
+
+        # if not customer:
+        #     customer = get_customer(receipt_info.customer)
+
         debit_to = get_debit_to(company)
+
         if len(type) > 0:
             mop = _get_mode_of_payment(type, device=device)
-
-        customer_name = frappe.db.get_value('Customer', customer, 'customer_name')
 
         si = frappe.get_doc({
             'doctype': 'Sales Invoice',
@@ -61,7 +72,7 @@ def generate_si_from_receipts():
             'company': company,
             "debit_to": debit_to,
             "due_date": receipt_info.date,
-            "customer": customer,
+            "customer": receipt_customer or customer,
             "customer_name": customer_name,
             "title": customer_name
         })
