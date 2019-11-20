@@ -61,11 +61,11 @@
   },
   {
    "fieldname": "custome_pin",
-   "fieldtype": "Data",
+   "fieldtype": "Password",
    "label": "Customer Pin"
   }
  ],
- "modified": "2019-11-21 02:13:01.091651",
+ "modified": "2019-11-21 02:37:26.135325",
  "modified_by": "Administrator",
  "module": "TailPOS Sync",
  "name": "Wallet",
