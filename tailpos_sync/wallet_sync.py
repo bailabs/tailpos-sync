@@ -15,7 +15,7 @@ def check_customers_pin(data):
         print(frappe.get_traceback())
 def compare_customers_pin(customers_pin, wallet_data):
     failed_message = {"message": "Invalid Customers Pin" , "failed": True}
-    success_message = {"message": "Valid Customers Pin. You can now proceed to wallet validation", "failed": False}
+    success_message = {"failed": False}
 
     return success_message if customers_pin == wallet_data[0].customer_pin else failed_message
 
@@ -30,7 +30,7 @@ def validate_if_customer_wallet_exists(data):
         print(customer_data)
         if customer_data and customer_data['credit_limit']:
             if customer_data['credit_limit'] + (customer_data['total_prepaid_balance'] - get_receipt_total(receipt)) >= 0:
-                return {"message": "Customer Wallet exists. Please scan assigned person wallet ", "failed": False}
+                return {"message": "Please scan attendant person wallet", "failed": False}
             else:
                 return {"message": "Insufficient Balance", "failed": True}
         else:
@@ -45,7 +45,7 @@ def validate_if_attendant_wallet_exists(data):
     print(wallet_card_number)
     attendant = frappe.db.sql(""" SELECT * FROM `tabAttendants` WHERE card_number=%s""", wallet_card_number)
     if len(attendant) > 0:
-        return {"message": "Attendant wallet exists. Please input valid customer pin", "failed": False}
+        return {"message": "Please input valid customer pin", "failed": False}
     frappe.log_error("Attendant wallet does not exists")
     return {"message": "Attendant wallet does not exists", "failed": True}
 
