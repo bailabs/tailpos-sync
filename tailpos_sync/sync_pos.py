@@ -39,10 +39,11 @@ def sync_data(data):
     tailpos_data = data['tailposData']
     sync_type = data['typeOfSync']
     device_id = data['deviceId']
-    uom_check()
-    deleted_records = get_deleted_documents()
-    delete_records(trash_object)
     try:
+        uom_check()
+        deleted_records = get_deleted_documents()
+        delete_records(trash_object)
+
         _sync_to_erpnext(tailpos_data, deleted_records,device_id)
 
         force_sync = (sync_type == "forceSync")
@@ -56,11 +57,12 @@ def sync_data(data):
             "deleted_documents": deleted_records
         }
 
-        return {"data": res}
+        return {"data": res, "status": True}
     except:
         print("ERRRROR")
         print(frappe.get_traceback())
         frappe.log_error(frappe.get_traceback(), 'sync failed')
+        return {"status": False}
 
 def check_modified(data, frappe_table):
     date_from_pos = datetime.datetime.fromtimestamp(data / 1000.0)
