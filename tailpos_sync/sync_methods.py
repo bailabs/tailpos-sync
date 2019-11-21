@@ -173,7 +173,7 @@ def sync_from_erpnext(device=None, force_sync=True):
     tables = get_tables_for_sync()
     pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
 
-    default_company = get_default_company()
+    default_company = get_default_company(device)
     data.extend(default_company)
 
     for table in tables:
@@ -416,15 +416,17 @@ def update_sync_data(data, table):
     return res
 
 
-def get_default_company():
+def get_default_company(device):
     default_company = frappe.get_single('Tail Settings')
+    default_company_from_device = frappe.db.get_value('Device', device, 'company')
+    if default_company_from_device:
+        default_company.company_name = default_company_from_device
     res = []
     res.append({
         'tableNames': "Company",
         'syncObject': default_company
     })
     return res
-
 
 def _get_discount_type(percentage_type):
     discount_type = {
