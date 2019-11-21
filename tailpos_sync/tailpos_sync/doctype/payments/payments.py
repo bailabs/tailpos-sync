@@ -18,3 +18,14 @@ class Payments(Document):
 
 	def validate(self):
 		set_date_updated(self)
+		try:
+			self.compute_receipt_total()
+		except:
+			print(frappe.get_traceback())
+	def compute_receipt_total(self):
+		receipt_total = 0
+		for i in self.payment_types:
+			receipt_total += i.amount
+		print("RECEEEEIPT")
+		print(frappe.db.sql(""" SELECT * FROM `tabReceipts` WHERE name=%s """, self.receipt))
+		frappe.db.sql(""" UPDATE `tabReceipts` SET total_amount=%s WHERE name=%s """,(receipt_total,self.receipt))

@@ -22,12 +22,6 @@ class Receipts(Document):
 	def set_total_amount(self):
 		self.total_amount = 0
 
-		for line in self.receipt_lines:
-			qty = float(line.qty)
-			price = float(line.price)
-
-			self.total_amount = self.total_amount + (price * qty)
-
 	def set_default_values(self):
 		"""Set the status as title-d form"""
 		self.status = self.status.title()

@@ -6,6 +6,7 @@
  "field_order": [
   "device_name",
   "pos_profile",
+  "company",
   "item_group_device",
   "device_item_group",
   "mode_of_payment_section",
@@ -60,9 +61,15 @@
    "fieldtype": "Table",
    "label": "Device Item Group",
    "options": "Device Item Group"
+  },
+  {
+   "description": "TailPOS Company Name",
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "label": "Company"
   }
  ],
- "modified": "2019-11-13 15:39:18.414978",
+ "modified": "2019-11-21 04:48:49.860994",
  "modified_by": "Administrator",
  "module": "TailPOS Sync",
  "name": "Device",
