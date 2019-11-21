@@ -2,7 +2,7 @@
 # Functions used by TailOrder
 # ---
 import frappe
-# import json
+import json
 
 from frappe import _
 from toolz import compose, partial, pluck
@@ -13,7 +13,7 @@ def fetch_items():
     use_price_list = frappe.db.get_single_value('Tail Settings', 'use_price_list')
 
     if use_price_list:
-        data = frappe.local.form_dict
+        data = json.loads(frappe.request.data)
         device = _validate_device(data.get('device'))
         pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
         items = get_items_with_price_list_rate(
