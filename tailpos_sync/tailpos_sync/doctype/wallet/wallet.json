@@ -7,7 +7,7 @@
   "wallet_card_number",
   "company",
   "customer",
-  "custome_pin",
+  "customer_pin",
   "prepaid_balance",
   "expiry_date",
   "id",
@@ -60,13 +60,13 @@
    "read_only": 1
   },
   {
-   "fieldname": "custome_pin",
+   "fieldname": "customer_pin",
    "fieldtype": "Password",
    "label": "Customer Pin"
   }
  ],
- "modified": "2019-11-21 02:37:26.135325",
- "modified_by": "Administrator",
+ "modified": "2019-11-22 15:20:06.961489",
+ "modified_by": "jangeles@bai.ph",
  "module": "TailPOS Sync",
  "name": "Wallet",
  "owner": "Administrator",
