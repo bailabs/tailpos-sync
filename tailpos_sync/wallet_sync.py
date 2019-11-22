@@ -1,9 +1,13 @@
 import frappe
 import datetime
 import json
+from frappe.utils.password import decrypt
+
+def test():
+    wallet_data = get_wallet("3e432dc3")
+    compare_customers_pin("123456789",wallet_data)
 @frappe.whitelist()
 def check_customers_pin(data):
-    print("CUSTOMERS pin")
     try:
         wallet_card_number = json.loads(data['wallet_card_number'])['customer']
         customers_pin = data['customers_pin']
@@ -15,9 +19,9 @@ def check_customers_pin(data):
         print(frappe.get_traceback())
 def compare_customers_pin(customers_pin, wallet_data):
     failed_message = {"message": "Invalid Customers Pin" , "failed": True}
-    success_message = {"failed": False}
+    success_message = {"message": "Please scan attendant card" , "failed": False}
 
-    return success_message if customers_pin == wallet_data[0].customer_pin else failed_message
+    return success_message if customers_pin == decrypt(wallet_data[0].customer_pin) else failed_message
 
 @frappe.whitelist()
 def validate_if_customer_wallet_exists(data):
@@ -30,7 +34,7 @@ def validate_if_customer_wallet_exists(data):
         print(customer_data)
         if customer_data and customer_data['credit_limit']:
             if customer_data['credit_limit'] + (customer_data['total_prepaid_balance'] - get_receipt_total(receipt)) >= 0:
-                return {"message": "Please scan attendant person wallet", "failed": False}
+                return {"message": "Please input valid customer pin", "failed": False}
             else:
                 return {"message": "Insufficient Balance", "failed": True}
         else:
@@ -45,7 +49,7 @@ def validate_if_attendant_wallet_exists(data):
     print(wallet_card_number)
     attendant = frappe.db.sql(""" SELECT * FROM `tabAttendants` WHERE card_number=%s""", wallet_card_number)
     if len(attendant) > 0:
-        return {"message": "Please input valid customer pin", "failed": False}
+        return {"failed": False}
     frappe.log_error("Attendant wallet does not exists")
     return {"message": "Attendant wallet does not exists", "failed": True}
 
@@ -68,11 +72,8 @@ def validate_wallet(data):
 
 
 
-#UPDATE WALLET FROM RECEIPT TOTAL
-def test():
-    balances = get_wallet("9AF076DF")
-    print(update_wallet_card(10000,balances))
 
+#UPDATE WALLET FROM RECEIPT TOTAL
 def update_wallet_card(receipt_total,balances):
 
     if len(balances) > 0:
@@ -137,10 +138,11 @@ def create_wallet_logs(wallet_data,update_wallet,receipt,balances,device,attenda
                 "prepaid_balance_before_deduction": balances[0].prepaid_balance,
                 "credit_balance_before_deduction": balances[0].credit_limit,
                 "amount": get_receipt_total(receipt),
-                "prepaid_after_before_deduction": update_wallet[0].prepaid_balance,
+                "prepaid_balance_after_deduction": update_wallet[0].prepaid_balance,
                 "credit_balance_after_deduction": update_wallet[0].credit_limit,
                 "attendant": attendant_name,
                 "device": device,
+                "top_up_wallet": 0,
             }
             frappe.get_doc(doc).insert(ignore_permissions=True)
         except:
