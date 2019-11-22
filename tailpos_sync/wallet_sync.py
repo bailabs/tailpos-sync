@@ -21,7 +21,7 @@ def compare_customers_pin(customers_pin, wallet_data):
     failed_message = {"message": "Invalid Customers Pin" , "failed": True}
     success_message = {"message": "Please scan attendant card" , "failed": False}
     password = get_decrypted_password("Wallet",wallet_data[0].name, "customer_pin")
-    print(success_message if customers_pin == password else failed_message)
+    return success_message if customers_pin == password else failed_message
 
 @frappe.whitelist()
 def validate_if_customer_wallet_exists(data):
