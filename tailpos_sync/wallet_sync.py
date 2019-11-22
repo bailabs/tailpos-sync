@@ -1,7 +1,7 @@
 import frappe
 import datetime
 import json
-from frappe.utils.password import decrypt
+from frappe.utils.password import get_decrypted_password
 
 def test():
     wallet_data = get_wallet("3e432dc3")
@@ -20,8 +20,8 @@ def check_customers_pin(data):
 def compare_customers_pin(customers_pin, wallet_data):
     failed_message = {"message": "Invalid Customers Pin" , "failed": True}
     success_message = {"message": "Please scan attendant card" , "failed": False}
-
-    return success_message if customers_pin == decrypt(wallet_data[0].customer_pin) else failed_message
+    password = get_decrypted_password("Wallet",wallet_data[0].name, "password")
+    return success_message if customers_pin == password else failed_message
 
 @frappe.whitelist()
 def validate_if_customer_wallet_exists(data):
