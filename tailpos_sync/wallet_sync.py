@@ -23,17 +23,36 @@ def compare_customers_pin(customers_pin, wallet_data):
     password = get_decrypted_password("Wallet",wallet_data[0].name, "customer_pin")
     return success_message if customers_pin == password else failed_message
 
+
+@frappe.whitelist()
+def get_balance(data):
+    print("GET BALAAAAAAAAANCE")
+    wallet_card_number = data['wallet_card_number']
+    wallet_data = get_wallet(wallet_card_number)
+    if len(wallet_data) > 0:
+        customer_data = get_customer_credit(wallet_data[0])
+        if customer_data and customer_data['credit_limit']:
+            print("BALAAAAAANCE")
+            print(customer_data['credit_limit'] + customer_data['total_prepaid_balance'])
+            return {"data": customer_data['credit_limit'] + customer_data['total_prepaid_balance'], "failed": False}
+        else:
+            return {"message": "Please set up credit limit in ERPNext","failed": True}
+    else:
+        frappe.log_error("Customer Wallet does not exist")
+        return {"message": "Customer Wallet does not exist", "failed": True}
+
 @frappe.whitelist()
 def validate_if_customer_wallet_exists(data):
-
+    print("check laaaang")
+    print(data['wallet_card_number'])
     wallet_card_number = data['wallet_card_number']
     receipt = data['receipt']
     wallet_data = get_wallet(wallet_card_number)
     if len(wallet_data) > 0:
         customer_data = get_customer_credit(wallet_data[0])
-        print(customer_data)
         if customer_data and customer_data['credit_limit']:
             if customer_data['credit_limit'] + (customer_data['total_prepaid_balance'] - get_receipt_total(receipt)) >= 0:
+                print("NAA MAN DRIRIIIIIi")
                 return {"message": "Please input valid customer pin", "failed": False}
             else:
                 return {"message": "Insufficient Balance", "failed": True}
@@ -46,7 +65,6 @@ def validate_if_customer_wallet_exists(data):
 @frappe.whitelist()
 def validate_if_attendant_wallet_exists(data):
     wallet_card_number = data['wallet_card_number']
-    print(wallet_card_number)
     attendant = frappe.db.sql(""" SELECT * FROM `tabAttendants` WHERE card_number=%s""", wallet_card_number)
     if len(attendant) > 0:
         return {"failed": False}
@@ -55,8 +73,6 @@ def validate_if_attendant_wallet_exists(data):
 
 @frappe.whitelist()
 def validate_wallet(data):
-    print(data)
-    print(json.loads(data['wallet'])['customer'])
     try:
         customer = json.loads(data['wallet'])['customer'] #CUSTOMER WALLET DATA FROM TAILPOS
         attendant = json.loads(data['wallet'])['attendant'] #ATTENDANT WALLET DATA FROM TAILPOS
@@ -92,9 +108,7 @@ def update_wallet_card(receipt_total,balances):
 #UPDATE CUSTOMER CREDIT
 @frappe.whitelist()
 def update_customer_credit(wallet_customer_name):
-    print(wallet_customer_name)
     total = frappe.db.sql("""SELECT SUM(prepaid_balance), company FROM tabWallet WHERE customer=%s""", wallet_customer_name)
-    print(total)
     frappe.db.sql(""" UPDATE `tabCustomer Credit Limit` SET total_prepaid_balance=%s WHERE parent=%s """, (total[0][0],wallet_customer_name ))
     frappe.db.commit()
     return True
@@ -105,8 +119,6 @@ def get_customer_credit(wallet):
     if customer.__dict__:
         for i in customer.credit_limits:
             if i.company == wallet.company:
-                print(i.__dict__['credit_limit'])
-                print(i.__dict__['total_prepaid_balance'])
                 return i.__dict__
     else:
         frappe.log_error("Please Setup Customer Credit Limit", 'Wallet Transaction Failed')
