@@ -39,7 +39,10 @@ fixtures = [
                     "Item-color_or_image",
                     "Payment Entry-wallet_card_number",
                     "Payment Entry-top_up_wallet",
-                    "Customer Credit Limit-total_prepaid_balance"
+                    "Customer Credit Limit-total_prepaid_balance",
+                    "Error Log-device_id",
+                    "Error Log-wallet_card",
+                    "Error Log-pin"
                 ]
             ]
         ]

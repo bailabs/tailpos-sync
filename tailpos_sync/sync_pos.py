@@ -59,7 +59,6 @@ def sync_data(data):
 
         return {"data": res, "status": True}
     except:
-        print("ERRRROR")
         print(frappe.get_traceback())
         frappe.log_error(frappe.get_traceback(), 'sync failed')
         return {"status": False}
