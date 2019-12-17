@@ -26,14 +26,17 @@ def check_customers_pin(data):
 
 
 def compare_customers_pin(customers_pin, wallet_data, data):
-    password = get_decrypted_password("Wallet",wallet_data[0].name, "customer_pin")
+    try:
+        password = get_decrypted_password("Wallet",wallet_data[0].name, "customer_pin")
 
-    if customers_pin == password:
-        return {"message": "Please scan attendant card" , "failed": False}
-    else:
+        if customers_pin == password:
+            return {"message": "Please scan attendant card" , "failed": False}
+        else:
+            create_error_log("Failed Checking Customers Pin", 'Customers Pin Check', data)
+            return {"message": "Failed Checking Customers Pin" , "failed": True}
+    except:
         create_error_log("Failed Checking Customers Pin", 'Customers Pin Check', data)
-        return {"message": "Failed Checking Customers Pin" , "failed": True}
-
+        return {"message": "Failed Checking Customers Pin", "failed": True}
 # GET BALANCE
 @frappe.whitelist()
 def get_balance(data):

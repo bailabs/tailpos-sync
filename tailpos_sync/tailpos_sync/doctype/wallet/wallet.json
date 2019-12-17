@@ -17,13 +17,17 @@
   {
    "fieldname": "wallet_card_number",
    "fieldtype": "Data",
-   "label": "Wallet Card Number"
+   "in_list_view": 1,
+   "label": "Wallet Card Number",
+   "reqd": 1
   },
   {
    "fieldname": "customer",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Customer",
-   "options": "Customer"
+   "options": "Customer",
+   "reqd": 1
   },
   {
    "fieldname": "prepaid_balance",
@@ -35,7 +39,8 @@
    "default": "Today",
    "fieldname": "expiry_date",
    "fieldtype": "Date",
-   "label": "Expiry Date"
+   "label": "Expiry Date",
+   "reqd": 1
   },
   {
    "fieldname": "amended_from",
@@ -49,8 +54,10 @@
   {
    "fieldname": "company",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Company",
-   "options": "Company"
+   "options": "Company",
+   "reqd": 1
   },
   {
    "fieldname": "id",
@@ -62,11 +69,13 @@
   {
    "fieldname": "customer_pin",
    "fieldtype": "Password",
-   "label": "Customer Pin"
+   "in_list_view": 1,
+   "label": "Customer Pin",
+   "reqd": 1
   }
  ],
- "modified": "2019-11-22 15:20:06.961489",
- "modified_by": "jangeles@bai.ph",
+ "modified": "2019-12-17 07:27:28.546543",
+ "modified_by": "Administrator",
  "module": "TailPOS Sync",
  "name": "Wallet",
  "owner": "Administrator",
