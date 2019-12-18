@@ -41,7 +41,8 @@ def generate_si_from_receipts():
             device = None
 
         if use_device_profile:
-            pos_profile = _get_device_pos_profile(device)
+            if device:
+                pos_profile = _get_device_pos_profile(device)
             company = frappe.db.get_value('POS Profile', pos_profile, 'company')
             receipt_customer = frappe.db.get_value('POS Profile', pos_profile, 'customer')
 
