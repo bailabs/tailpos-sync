@@ -324,7 +324,7 @@ def new_doc(data, owner='Administrator'):
             'shift': sync_object['shift'],
             'customer': sync_object['customer'],
             'attendant': sync_object['attendant'],
-            'taxesvalue': sync_object['taxesAmount'],
+            'taxesvalue': round(sync_object['taxesAmount'],2),
             'discount': sync_object['discount'],
             'reason': sync_object['reason'],
             'deviceid': sync_object['deviceId'],

@@ -16,8 +16,6 @@ class Receipts(Document):
 			self.id = 'Receipt/' + str(uuid.uuid4())
 		self.name = self.id
 
-	def validate(self):
-		set_date_updated(self)
 
 	def set_total_amount(self):
 		self.total_amount = 0
@@ -31,3 +29,14 @@ class Receipts(Document):
 	def before_insert(self):
 		"""Setup the Receipts document"""
 		self.set_default_values()
+	def compute_total(self):
+		total_amount = 0
+		for i in self.receipt_lines:
+			total_amount += float(i.price) * float(i.qty)
+
+		total_amount -= self.discountvalue
+		total_amount += self.taxesvalue
+
+	def validate(self):
+		set_date_updated(self)
+		self.compute_total()

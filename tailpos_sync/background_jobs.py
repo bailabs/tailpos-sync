@@ -52,8 +52,6 @@ def generate_si_from_receipts():
             'customer_name'
         )
 
-        print(device)
-
         type = _get_receipts_payment_type(receipt.name)
         items = get_receipt_items(receipt.name)
         receipt_info = get_receipt(receipt.name)
@@ -103,7 +101,6 @@ def _insert_invoice(invoice, mop, taxes_total, submit=False, allow_negative_stoc
     invoice.insert()
     if len(mop) > 0:
         for x in mop:
-            print(x)
             invoice.append('payments', {
                 'mode_of_payment': x['mode_of_payment'],
                 'amount': x['amount']
@@ -179,11 +176,6 @@ def _get_device_mode_of_payment(device, type):
                 _('Set the device mode of payment for {} in device {}'.format(i.type,device))
             )
         else:
-            print("DEVIIIIIIIIIICE")
-            print({
-                "mode_of_payment": mop[0].mode_of_payment,
-                "amount": i.amount
-            })
             mode_of_payment.append({
                 "mode_of_payment": mop[0].mode_of_payment,
                 "amount": i.amount
@@ -208,13 +200,10 @@ def test(receipt,device):
     customer = frappe.db.get_value('POS Profile', pos_profile, 'customer')
 
     company = frappe.db.get_value('POS Profile', pos_profile, 'company')
-    print(company)
-    print(get_debit_to(company))
     type = _get_receipts_payment_type(receipt)
     items = get_receipt_items(receipt)
     receipt_info = get_receipt(receipt)
     if type:
-        print(type)
         mop = _get_mode_of_payment(type, device=device)
 
     si = frappe.get_doc({
