@@ -29,6 +29,7 @@ class Receipts(Document):
 	def before_insert(self):
 		"""Setup the Receipts document"""
 		self.set_default_values()
+
 	def compute_total(self):
 		total_amount = 0
 		for i in self.receipt_lines:
@@ -36,6 +37,7 @@ class Receipts(Document):
 
 		total_amount -= self.discountvalue
 		total_amount += self.taxesvalue
+		self.total_amount = total_amount
 
 	def validate(self):
 		set_date_updated(self)
