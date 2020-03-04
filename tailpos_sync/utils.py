@@ -148,8 +148,8 @@ def get_items_with_price_list_query(device,columns=None, pos_profile=None,):
       SELECT %s FROM `tabItem` 
       INNER JOIN `tabItem Price` ON `tabItem`.name = `tabItem Price`.item_code
       LEFT JOIN `tabItem Tax` ON `tabItem`.name = `tabItem Tax`.parent
-      LEFT JOIN `tabItem Tax Template Detail` ON `tabItem Tax Template Detail`.parent = `tabItem Tax`.item_tax_template
-      WHERE `tabItem`.in_tailpos = 1 AND `tabItem Price`.price_list= '%s' {0} """.format(condition) % (columns_str, price_list)
+      
+      WHERE `tabItem`.in_tailpos = 1 AND `tabItem Price`.price_list= '%s' {0}""".format(condition) % (columns_str, price_list)
 
     return query
 

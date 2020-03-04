@@ -26,7 +26,7 @@ def get_item_query(pos_profile,device):
         'tabItem.stock_uom',
         'tabItem.item_name',
         'tabItem.color_or_image',
-        '`tabItem Tax Template Detail`.tax_rate'
+        '`tabItem Tax`.item_tax_template'
     ]
 
     standard_rate = 'standard_rate'
@@ -45,7 +45,6 @@ def get_table_select_query(table,device, force_sync=True, pos_profile=None):
     query = "SELECT * FROM `tab{0}`".format(table)
     if table == 'Item':
         query = get_item_query(pos_profile,device)
-    print(query)
     if not force_sync:
         connector = " AND " if "WHERE" in query else " WHERE "
         if table == "Item":
@@ -169,6 +168,7 @@ def get_deleted_documents():
 
 
 def sync_from_erpnext(device=None, force_sync=True):
+    print('didir man ata')
     data = []
     tables = get_tables_for_sync()
     pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
@@ -179,6 +179,13 @@ def sync_from_erpnext(device=None, force_sync=True):
     for table in tables:
         query = get_table_select_query(table,device, force_sync, pos_profile=pos_profile)
         query_data = frappe.db.sql(query, as_dict=True)
+        if table == "Item":
+            for i in query_data:
+                if 'item_tax_template' in i:
+                    item_tax_details = frappe.db.sql(""" SELECT tax_type, tax_rate FROM `tabItem Tax Template Detail` WHERE parent=%s""", i.item_tax_template ,as_dict=True)
+                    i.item_tax_template_detail = item_tax_details
+                print('ITEEEEEEEEEEEM')
+                print(i)
         sync_data = update_sync_data(query_data, table)
 
         if sync_data:
@@ -189,6 +196,7 @@ def sync_from_erpnext(device=None, force_sync=True):
 
 # DEPRECATED
 def force_sync_from_erpnext_to_tailpos(device=None):
+    print("NAA MAN UNTA DIRI")
     """
     Fetches all data in ERPNext.
 
@@ -204,7 +212,13 @@ def force_sync_from_erpnext_to_tailpos(device=None):
     try:
         for table in tables:
             query = get_table_select_query(table, device,pos_profile=pos_profile)
+
             query_data = frappe.db.sql(query, as_dict=True)
+
+            if table == "Item":
+                for i in query_data:
+                    print("ITEEEEM MAO NING NAAY TAX")
+                    print(i)
             sync_data = update_sync_data(query_data, table)
             data.extend(sync_data)
     except Exception:
