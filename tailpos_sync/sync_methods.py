@@ -183,9 +183,14 @@ def sync_from_erpnext(device=None, force_sync=True):
             for i in query_data:
                 if 'item_tax_template' in i:
                     item_tax_details = frappe.db.sql(""" SELECT tax_type, tax_rate FROM `tabItem Tax Template Detail` WHERE parent=%s""", i.item_tax_template ,as_dict=True)
-                    i.item_tax_template_detail = item_tax_details
-                print('ITEEEEEEEEEEEM')
-                print(i)
+                    item_tax_details_split = []
+                    for iii in item_tax_details:
+                        item_tax_details_split.append({
+                            "tax_type": iii.tax_type.split("-")[0],
+                            "tax_rate": iii.tax_rate
+                        })
+                    i.item_tax_template_detail = item_tax_details_split
+
         sync_data = update_sync_data(query_data, table)
 
         if sync_data:
