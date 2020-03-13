@@ -51,7 +51,9 @@ def sync_data(data):
 
         if not erpnext_data:
             erpnext_data = ""
-
+        erpnext_data.append(get_device(device_id))
+        print("ERPNEEEEEEEEEEEEEEEEEEEXT DATA")
+        print(erpnext_data)
         res = {
             "data": erpnext_data,
             "deleted_documents": deleted_records
@@ -63,6 +65,34 @@ def sync_data(data):
         frappe.log_error(frappe.get_traceback(), 'sync failed')
         return {"status": False}
 
+def get_device(device_id):
+    payment_types = ""
+
+    if device_id:
+        print(device_id)
+        try:
+            device_record = frappe.get_doc("Device", device_id)
+
+            if device_record:
+                for idx,i in enumerate(device_record.mop):
+                    payment_types += i.__dict__['payment_type']
+                    if idx != len(device_record.mop) - 1:
+                        payment_types += ","
+        except:
+            tailpos_settings_payment = frappe.get_single("Tail Settings")
+            for idx, i in enumerate(tailpos_settings_payment.mop):
+                payment_types += i.__dict__['payment_type']
+                if idx != len(tailpos_settings_payment.mop) - 1:
+                    payment_types += ","
+            frappe.log_error(frappe.get_traceback())
+    else:
+        tailpos_settings_payment = frappe.get_single("Tail Settings")
+        for idx, i in enumerate(tailpos_settings_payment.mop):
+            payment_types += i.__dict__['payment_type']
+            if idx != len(tailpos_settings_payment.mop) - 1:
+                payment_types += ","
+
+    return {"tableNames": "Device", "paymentTypes": payment_types}
 def check_modified(data, frappe_table):
     date_from_pos = datetime.datetime.fromtimestamp(data / 1000.0)
 

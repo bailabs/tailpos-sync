@@ -4,6 +4,7 @@ import frappe
 def validate(doc, method):
     taxes = []
     doc.taxes = []
+    total_taxes = 0
     for sales_item in doc.items:
         sales_invoice_item = sales_item.__dict__
         if sales_invoice_item['item_tax_template']:
@@ -21,7 +22,7 @@ def validate(doc, method):
                         "total": ((i.tax_rate / 100) * sales_invoice_item['amount']) + sales_invoice_item['amount'],
                         "base_total": ((i.tax_rate / 100) * sales_invoice_item['amount']) + sales_invoice_item['amount']
                     })
-
+                    total_taxes += (i.tax_rate / 100) * sales_invoice_item['amount']
                 else:
                     for iii in doc.taxes:
                         if iii.__dict__['account_head'] == i.tax_type:
@@ -29,3 +30,8 @@ def validate(doc, method):
                             iii.__dict__['base_tax_amount'] += (i.tax_rate / 100) * sales_invoice_item['amount']
                             iii.__dict__['total'] += ((i.tax_rate / 100) * sales_invoice_item['amount']) + sales_invoice_item['amount']
                             iii.__dict__['base_total'] += ((i.tax_rate / 100) * sales_invoice_item['amount']) + sales_invoice_item['amount']
+                            total_taxes += (i.tax_rate / 100) * sales_invoice_item['amount']
+
+    doc.total_taxes_and_charges = total_taxes
+    doc.grand_total = total_taxes + doc.total
+    doc.outstanding_amount = total_taxes + doc.total

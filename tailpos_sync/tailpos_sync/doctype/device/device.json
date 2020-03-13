@@ -69,7 +69,7 @@
    "label": "Company"
   }
  ],
- "modified": "2019-11-21 04:48:49.860994",
+ "modified": "2020-03-13 14:35:37.703520",
  "modified_by": "Administrator",
  "module": "TailPOS Sync",
  "name": "Device",
@@ -88,6 +88,7 @@
    "write": 1
   }
  ],
+ "search_fields": "device_name",
  "sort_field": "modified",
  "sort_order": "DESC",
  "title_field": "device_name",

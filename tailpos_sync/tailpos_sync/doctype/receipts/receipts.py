@@ -31,13 +31,7 @@ class Receipts(Document):
 		self.set_default_values()
 
 	def compute_total(self):
-		total_amount = 0
-		for i in self.receipt_lines:
-			total_amount += float(i.price) * float(i.qty)
-
-		total_amount -= self.discountvalue
-		total_amount += self.taxesvalue
-		self.total_amount = total_amount
+		self.total_amount = (self.subtotal + self.taxesvalue) - self.discountvalue
 
 	def validate(self):
 		set_date_updated(self)

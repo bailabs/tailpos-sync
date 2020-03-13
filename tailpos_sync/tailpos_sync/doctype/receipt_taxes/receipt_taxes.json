@@ -1,19 +1,18 @@
 {
- "creation": "2019-11-08 09:18:30.076505",
+ "creation": "2020-03-11 12:56:31.362379",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "type",
+  "tax",
   "amount"
  ],
  "fields": [
   {
-   "fieldname": "type",
-   "fieldtype": "Select",
+   "fieldname": "tax",
+   "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Type",
-   "options": "Cash*\nCard\nVisa\nAmex\nSapn\nWallet"
+   "label": "Tax"
   },
   {
    "fieldname": "amount",
@@ -23,12 +22,13 @@
   }
  ],
  "istable": 1,
- "modified": "2020-03-13 09:22:54.348967",
+ "modified": "2020-03-11 12:56:43.535682",
  "modified_by": "Administrator",
  "module": "TailPOS Sync",
- "name": "Payment Types",
+ "name": "Receipt Taxes",
  "owner": "Administrator",
  "permissions": [],
+ "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "track_changes": 1

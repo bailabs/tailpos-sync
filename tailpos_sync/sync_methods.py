@@ -199,64 +199,6 @@ def sync_from_erpnext(device=None, force_sync=True):
     return data
 
 
-# DEPRECATED
-def force_sync_from_erpnext_to_tailpos(device=None):
-    print("NAA MAN UNTA DIRI")
-    """
-    Fetches all data in ERPNext.
-
-    :param device:
-    :retdilurn data:
-    """
-    data = []
-    tables = get_tables_for_sync()
-
-    if device:
-        pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
-
-    try:
-        for table in tables:
-            query = get_table_select_query(table, device,pos_profile=pos_profile)
-
-            query_data = frappe.db.sql(query, as_dict=True)
-
-            if table == "Item":
-                for i in query_data:
-                    print("ITEEEEM MAO NING NAAY TAX")
-                    print(i)
-            sync_data = update_sync_data(query_data, table)
-            data.extend(sync_data)
-    except Exception:
-        print(frappe.get_traceback())
-
-    return data
-
-
-# DEPRECATED
-def sync_from_erpnext_to_tailpos(device=None):
-    """
-    Fetch added/updated data in ERPNext.
-
-    :param device: name of the Device doctype
-    :return data: sync data
-    """
-    data = []
-    tables = get_tables_for_sync()
-    if device:
-        pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
-
-    for table in tables:
-        query = get_table_select_query(table,device, False, pos_profile=pos_profile)
-        query_data = frappe.db.sql(query, as_dict=True)
-
-        # Kung naay sulod
-        if len(query_data) > 0:
-            sync_data = update_sync_data(query_data, table)
-            data.extend(sync_data)
-
-    return data
-
-
 def delete_records(data):
     for check in data:
         table_name = check.get('table_name')
@@ -332,12 +274,16 @@ def new_doc(data, owner='Administrator'):
         })
 
     elif db_name == 'Payments':
+        print("PAYMEEEEEEEEEEENTS")
         doc.update({
             'paid': sync_object['paid'],
             'receipt': sync_object['receipt'],
-            'date': get_date_fromtimestamp(sync_object['date'])
+            'date': get_date_fromtimestamp(sync_object['date']),
+            'payment_types': get_payment_types(sync_object['type'])
         })
     elif db_name == 'Receipts':
+        print("RECEEEEEEEIPTS")
+        print(sync_object['status'].capitalize())
         doc.update({
             'status': sync_object['status'].capitalize(),
             'shift': sync_object['shift'],
@@ -352,37 +298,76 @@ def new_doc(data, owner='Administrator'):
             'discounttype': sync_object['discountType'].title(),
             'date': get_date_fromtimestamp(sync_object['date']),
             'receipt_lines': get_receipt_lines(sync_object['lines']),
+            'receipt_taxes': get_taxes(sync_object['lines']),
+            'subtotal': subtotal(sync_object['lines']),
         })
 
-    if db_name != "Payments":
-        return frappe.get_doc(doc)
-    else:
-        try:
-            payment = frappe.get_doc(doc)
-            if sync_object['type']:
-                for i in json.loads(sync_object['type']):
-                    payment.append("payment_types", {
-                        "type": i['type'],
-                        "amount": i['amount'],
-                    })
+    return frappe.get_doc(doc)
 
-            return payment
-        except:
-            print(frappe.get_traceback())
+def get_payment_types(payment):
+    _payment_types = []
+
+    payment_types = json.loads(payment)
+    for type in payment_types:
+        _payment_types.append({
+            "type": type['type'],
+            "amount": type['amount'],
+        })
+    return _payment_types
+
+def get_taxes(lines):
+    receipt_taxes = []
+
+    for line in lines:
+        tax_in_line = json.loads(line['tax'])
+        for i in tax_in_line:
+            if len(receipt_taxes) > 0:
+                if not any(x['tax'] == i['tax_type'] for x in receipt_taxes):
+                    receipt_taxes.append({
+                        'tax': i['tax_type'],
+                        'amount': (i['tax_rate'] / 100) * (line['qty'] * line['price']),
+                    })
+                else:
+                    for ii in receipt_taxes:
+                        if ii['tax'] == i['tax_type']:
+                            ii['amount'] += (i['tax_rate'] / 100) * (line['qty'] * line['price'])
+            else:
+                receipt_taxes.append({
+                    'tax': i['tax_type'],
+                    'amount': (i['tax_rate'] / 100) * (line['qty'] * line['price']),
+                })
+    return receipt_taxes
 def get_receipt_lines(lines):
     receipt_lines = []
 
     for line in lines:
+        taxes_in_string = ""
+        tax_in_line = json.loads(line['tax'])
+        tax_total = 0
+
+        for i in tax_in_line:
+            tax_total += (i['tax_rate'] / 100) * (line['qty'] * line['price'])
+            taxes_in_string += i['tax_type'] + "  -  " + str(i['tax_rate'])
         receipt_lines.append({
             'item': line['item'],
             'item_name': line['item_name'],
             'sold_by': line['sold_by'],
             'price': line['price'],
-            'qty': line['qty']
+            'qty': line['qty'],
+            'item_total_tax': tax_total,
+            'taxes': taxes_in_string
         })
 
     return receipt_lines
 
+
+def subtotal(lines):
+    subtotal = 0
+
+    for line in lines:
+        subtotal = subtotal + (line['price'] * line['qty'])
+
+    return subtotal
 
 def uom_check():
     each = frappe.db.sql(""" SELECT * FROM `tabUOM` WHERE name='Each'""")
@@ -453,3 +438,81 @@ def _get_discount_type(percentage_type):
         'percentage': 'Percentage'
     }
     return discount_type[percentage_type]
+
+#
+# {
+#     'date': 1583856000000,
+#     'status': 'completed',
+#     'reason': '',
+#     'customer': 'Customer/1e8c31e0-6371-11ea-b3de-0d1c460c1f76',
+#     'lines': [
+#         {
+#             '_id': 'ReceiptLine/e7a7c731-6374-11ea-8870-b9f7207fa201',
+#             'item': 'STO-ITEM-2020-00037',
+#             'item_name': 'Spicy Green Salad',
+#             'sold_by': '',
+#             'category': 'Salad',
+#             'price': 14.29,
+#             'qty': 1,
+#             'commission_details': '[]',
+#             'discount_rate': 0,
+#             'tax': '[{"tax_type":"VAT 5% ","tax_rate":5}]',
+#             'discountType': 'percentage'},
+#         {
+#             '_id': 'ReceiptLine/e7a99bf1-6374-11ea-8870-b9f7207fa201',
+#             'item': 'STO-ITEM-2020-00056',
+#             'item_name': 'Dry Fruits Sundae',
+#             'sold_by': '',
+#             'category': 'Ice Cream',
+#             'price': 23.81,
+#             'qty': 1,
+#             'commission_details': '[]',
+#             'discount_rate': 0,
+#             'tax': '[{"tax_type":"VAT 5% ","tax_rate":5}]',
+#             'discountType': 'percentage'},
+#         {
+#             '_id': 'ReceiptLine/e7aad471-6374-11ea-8870-b9f7207fa201',
+#             'item': 'STO-ITEM-2020-00021',
+#             'item_name': 'Easy Dynamite Shrimp',
+#             'sold_by': '',
+#             'category': 'Appetizer',
+#             'price': 26.67,
+#             'qty': 1,
+#             'commission_details': '[]',
+#             'discount_rate': 0,
+#             'tax': '[{"tax_type":"VAT 5% ","tax_rate":5}]',
+#             'discountType': 'percentage'},
+#         {
+#             '_id': 'ReceiptLine/e7ac0cf1-6374-11ea-8870-b9f7207fa201',
+#             'item': 'STO-ITEM-2020-00022',
+#             'item_name': 'Chicken 65',
+#             'sold_by': '',
+#             'category': 'Appetizer',
+#             'price': 19.05,
+#             'qty': 1,
+#             'commission_details': '[]',
+#             'discount_rate': 0,
+#             'tax': '[{"tax_type":"VAT 5% ","tax_rate":5}]',
+#             'discountType': 'percentage'
+#         }],
+#     'discountName': '',
+#     'discount': '',
+#     'discountValue': 0,
+#     'receiptNumber': 1,
+#     'vatNumber': '0',
+#     'ticketNumber': 1,
+#     'hasTailOrder': True,
+#     'discountType': 'percentage',
+#     'taxesValue': '0',
+#     'taxesAmount': 4.191000000000001,
+#     'shift': 'Shift/1e275591-6371-11ea-b3de-0d1c460c1f76',
+#     'deviceId': '839ff571d8',
+#     'dateUpdated': 1583915811985,
+#     'syncStatus': False,
+#     'roundOff': True,
+#     'attendant': 'Test',
+#     'totalAmount': 88,
+#     'orderType': 'Dine-in',
+#     '_id': 'Receipt/74c7c720-6373-11ea-b3de-0d1c460c1f76',
+#     '_rev': '22-e8066ea8aa574a5177a628765e2ac9dc'
+# }
