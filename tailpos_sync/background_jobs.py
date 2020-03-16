@@ -3,7 +3,7 @@ from frappe import _
 from frappe.utils.background_jobs import enqueue
 from .utils import get_receipt_items
 
-
+@frappe.whitelist()
 def generate_si():
     """
     Make this as a cron task.
