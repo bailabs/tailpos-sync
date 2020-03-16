@@ -32,7 +32,12 @@ class Receipts(Document):
 
 	def compute_total(self):
 		self.total_amount = (self.subtotal + self.taxesvalue) - self.discountvalue
-
+	def compute_subtotal(self):
+		subtotal = 0
+		for item in self.receipt_lines:
+			subtotal += (float(item.__dict__['qty']) * float(item.__dict__['price']))
+		self.subtotal = subtotal
 	def validate(self):
 		set_date_updated(self)
+		self.compute_subtotal()
 		self.compute_total()

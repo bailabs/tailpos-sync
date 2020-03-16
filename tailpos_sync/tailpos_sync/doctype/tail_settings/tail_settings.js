@@ -18,10 +18,8 @@ cur_frm.cscript.manual_generate_sales_invoice = function (){
 	frappe.call({
 		method: "tailpos_sync.background_jobs.generate_si",
 		args:{},
-		callback: function (r) {
-			if(r.message === "Success"){
-				frappe.msgprint("Done Creating Sales Invoice")
-			}
+		callback: function (){
+			frappe.msgprint("Creating Sales Invoice...")
         }
 	})
 }
