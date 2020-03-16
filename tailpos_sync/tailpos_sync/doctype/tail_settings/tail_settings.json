@@ -8,6 +8,8 @@
   "submit_invoice",
   "column_break_3",
   "generate_limit",
+  "force_generate_sales_invoice",
+  "manual_generate_sales_invoice",
   "section_break_2",
   "pos_profile",
   "use_price_list",
@@ -142,10 +144,21 @@
    "fieldname": "update_items_with_no_tailpos_id",
    "fieldtype": "Button",
    "label": "Update items with no TailPOS id"
+  },
+  {
+   "default": "0",
+   "fieldname": "force_generate_sales_invoice",
+   "fieldtype": "Check",
+   "label": "Force Generate Sales Invoice"
+  },
+  {
+   "fieldname": "manual_generate_sales_invoice",
+   "fieldtype": "Button",
+   "label": "Manual Generate Sales Invoice"
   }
  ],
  "issingle": 1,
- "modified": "2019-11-19 03:28:41.277599",
+ "modified": "2020-03-16 09:39:50.283654",
  "modified_by": "Administrator",
  "module": "TailPOS Sync",
  "name": "Tail Settings",

@@ -1,7 +1,7 @@
 from .sync_methods import *
 import frappe
 import datetime
-
+from .background_jobs import *
 
 @frappe.whitelist()
 def tailpos_test(data):
@@ -39,6 +39,7 @@ def sync_data(data):
     tailpos_data = data['tailposData']
     sync_type = data['typeOfSync']
     device_id = data['deviceId']
+    force_generate_sales_invoice = frappe.db.get_single_value('Tail Settings', 'force_generate_sales_invoice')
     try:
         uom_check()
         deleted_records = get_deleted_documents()
@@ -52,8 +53,9 @@ def sync_data(data):
         if not erpnext_data:
             erpnext_data = ""
         erpnext_data.append(get_device(device_id))
-        print("ERPNEEEEEEEEEEEEEEEEEEEXT DATA")
-        print(erpnext_data)
+
+        if force_generate_sales_invoice:
+            generate_si()
         res = {
             "data": erpnext_data,
             "deleted_documents": deleted_records
