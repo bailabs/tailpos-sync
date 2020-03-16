@@ -43,9 +43,7 @@ def get_receipts(filters, data, columns):
 	condition_store = get_store_condition(filters)
 	condition_cost_center = get_cost_center_condition(filters,fields)
 	query = """ SELECT {0} FROM `tabReceipts` {1} WHERE date BETWEEN '{2}' and '{3}' {4}""".format(fields,condition_cost_center,_from, _to,condition_store)
-	print(query)
 	receipts = frappe.db.sql(query, as_dict=True)
-	print(receipts)
 	for i in receipts:
 		payment = frappe.db.sql(""" SELECT * FROM `tabPayments` WHERE receipt=%s""",(i.name),as_dict=True)
 		sales_invoice = frappe.db.sql(""" SELECT * FROM `tabSales Invoice` WHERE name=%s""",(i.reference_invoice),as_dict=True)
@@ -66,7 +64,9 @@ def get_receipts(filters, data, columns):
 			"paid_amount": payment[0].paid,
 			"change": payment[0].change
 		}
-		type_object = json.loads(payment[0].type) if len(payment) > 0 else []
+		print("PAYMEEENT")
+		print(payment)
+		type_object = json.loads(payment[0].type) if payment[0].type else []
 		for type in type_object:
 			obj[type['type']] = type['amount']
 			if not any(x['fieldname'] == type['type'] for x in columns):
