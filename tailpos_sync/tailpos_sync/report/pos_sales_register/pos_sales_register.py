@@ -66,7 +66,7 @@ def get_receipts(filters, data, columns):
 			"paid_amount": payment[0].paid,
 			"change": payment[0].change
 		}
-		type_object = json.loads(payment[0].type)
+		type_object = json.loads(payment[0].type) if len(payment) > 0 else []
 		for type in type_object:
 			obj[type['type']] = type['amount']
 			if not any(x['fieldname'] == type['type'] for x in columns):
