@@ -3,7 +3,7 @@ import frappe
 import datetime
 import json
 
-from .utils import get_items_with_price_list_query
+from .utils import get_items_with_price_list_query,get_device_categories
 
 
 def get_tables_for_sync():
@@ -37,14 +37,32 @@ def get_item_query(pos_profile,device):
     columns.append(standard_rate)
 
     return get_items_with_price_list_query(device,columns, pos_profile)
+def get_category_query(device):
+    categories = get_device_categories(device)
+    condition = ""
+    if len(categories) > 0:
+        condition += "WHERE ("
 
+        for idx,category in enumerate(categories):
+            condition += "name='{0}'".format(category)
+            if int(idx) < int(len(categories) - 1):
+                condition += "OR"
+
+        condition += ")"
+
+    query = """SELECT * FROM `tabCategories` {0}""".format(condition)
+    print(query)
+    return query
 def test():
     pos_profile = frappe.db.get_value('Device', "f2ef25d668", 'pos_profile')
     get_table_select_query("Item", "f2ef25d668", True, pos_profile)
+
 def get_table_select_query(table,device, force_sync=True, pos_profile=None):
     query = "SELECT * FROM `tab{0}`".format(table)
     if table == 'Item':
         query = get_item_query(pos_profile,device)
+    if table == "Categories":
+        query = get_category_query(device)
     if not force_sync:
         connector = " AND " if "WHERE" in query else " WHERE "
         if table == "Item":
@@ -274,7 +292,6 @@ def new_doc(data, owner='Administrator'):
         })
 
     elif db_name == 'Payments':
-        print("PAYMEEEEEEEEEEENTS")
         doc.update({
             'paid': sync_object['paid'],
             'receipt': sync_object['receipt'],
@@ -282,8 +299,6 @@ def new_doc(data, owner='Administrator'):
             'payment_types': get_payment_types(sync_object['type'])
         })
     elif db_name == 'Receipts':
-        print("RECEEEEEEEIPTS")
-        print(sync_object['status'].capitalize())
         doc.update({
             'status': sync_object['status'].capitalize(),
             'shift': sync_object['shift'],
@@ -438,81 +453,3 @@ def _get_discount_type(percentage_type):
         'percentage': 'Percentage'
     }
     return discount_type[percentage_type]
-
-#
-# {
-#     'date': 1583856000000,
-#     'status': 'completed',
-#     'reason': '',
-#     'customer': 'Customer/1e8c31e0-6371-11ea-b3de-0d1c460c1f76',
-#     'lines': [
-#         {
-#             '_id': 'ReceiptLine/e7a7c731-6374-11ea-8870-b9f7207fa201',
-#             'item': 'STO-ITEM-2020-00037',
-#             'item_name': 'Spicy Green Salad',
-#             'sold_by': '',
-#             'category': 'Salad',
-#             'price': 14.29,
-#             'qty': 1,
-#             'commission_details': '[]',
-#             'discount_rate': 0,
-#             'tax': '[{"tax_type":"VAT 5% ","tax_rate":5}]',
-#             'discountType': 'percentage'},
-#         {
-#             '_id': 'ReceiptLine/e7a99bf1-6374-11ea-8870-b9f7207fa201',
-#             'item': 'STO-ITEM-2020-00056',
-#             'item_name': 'Dry Fruits Sundae',
-#             'sold_by': '',
-#             'category': 'Ice Cream',
-#             'price': 23.81,
-#             'qty': 1,
-#             'commission_details': '[]',
-#             'discount_rate': 0,
-#             'tax': '[{"tax_type":"VAT 5% ","tax_rate":5}]',
-#             'discountType': 'percentage'},
-#         {
-#             '_id': 'ReceiptLine/e7aad471-6374-11ea-8870-b9f7207fa201',
-#             'item': 'STO-ITEM-2020-00021',
-#             'item_name': 'Easy Dynamite Shrimp',
-#             'sold_by': '',
-#             'category': 'Appetizer',
-#             'price': 26.67,
-#             'qty': 1,
-#             'commission_details': '[]',
-#             'discount_rate': 0,
-#             'tax': '[{"tax_type":"VAT 5% ","tax_rate":5}]',
-#             'discountType': 'percentage'},
-#         {
-#             '_id': 'ReceiptLine/e7ac0cf1-6374-11ea-8870-b9f7207fa201',
-#             'item': 'STO-ITEM-2020-00022',
-#             'item_name': 'Chicken 65',
-#             'sold_by': '',
-#             'category': 'Appetizer',
-#             'price': 19.05,
-#             'qty': 1,
-#             'commission_details': '[]',
-#             'discount_rate': 0,
-#             'tax': '[{"tax_type":"VAT 5% ","tax_rate":5}]',
-#             'discountType': 'percentage'
-#         }],
-#     'discountName': '',
-#     'discount': '',
-#     'discountValue': 0,
-#     'receiptNumber': 1,
-#     'vatNumber': '0',
-#     'ticketNumber': 1,
-#     'hasTailOrder': True,
-#     'discountType': 'percentage',
-#     'taxesValue': '0',
-#     'taxesAmount': 4.191000000000001,
-#     'shift': 'Shift/1e275591-6371-11ea-b3de-0d1c460c1f76',
-#     'deviceId': '839ff571d8',
-#     'dateUpdated': 1583915811985,
-#     'syncStatus': False,
-#     'roundOff': True,
-#     'attendant': 'Test',
-#     'totalAmount': 88,
-#     'orderType': 'Dine-in',
-#     '_id': 'Receipt/74c7c720-6373-11ea-b3de-0d1c460c1f76',
-#     '_rev': '22-e8066ea8aa574a5177a628765e2ac9dc'
-# }
