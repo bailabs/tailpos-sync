@@ -100,17 +100,21 @@ def get_debit_to(company):
 
 def _insert_invoice(invoice, mop, taxes_total, submit=False, allow_negative_stock=False):
     invoice.insert()
+    total_paid = 0
     if len(mop) > 0:
         for x in mop:
             invoice.append('payments', {
                 'mode_of_payment': x['mode_of_payment'],
                 'amount': x['amount']
             })
+            total_paid += x['amount']
+
     else:
         invoice.append('payments', {
             'mode_of_payment': "Cash",
             'amount': invoice.outstanding_amount
         })
+        total_paid += invoice.outstanding_amount
     invoice.set_missing_values()
     invoice.save()
     frappe.db.set_value("Sales Invoice", invoice.name, "tax_category", "")
@@ -127,7 +131,9 @@ def _insert_invoice(invoice, mop, taxes_total, submit=False, allow_negative_stoc
         frappe.db.set_value("Sales Invoice", invoice.name, "grand_total", float(invoice.grand_total) + float(taxes_total))
         frappe.db.set_value("Sales Invoice", invoice.name, "rounded_total", round(float(invoice.grand_total) + float(taxes_total)))
         frappe.db.set_value("Sales Invoice", invoice.name, "outstanding_amount", round(float(invoice.grand_total) + float(taxes_total)))
-        frappe.db.set_value("Sales Invoice", invoice.name, "paid_amount", round(float(invoice.grand_total) + float(taxes_total)))
+        frappe.db.set_value("Sales Invoice", invoice.name, "paid_amount", total_paid)
+        frappe.db.set_value("Sales Invoice", invoice.name, "change_amount", total_paid - (round(float(invoice.grand_total) + float(taxes_total))))
+        frappe.db.set_value("Sales Invoice", invoice.name, "base_change_amount", total_paid - (round(float(invoice.grand_total) + float(taxes_total))))
         frappe.db.set_value("Sales Invoice", invoice.name, "in_words", money_in_words(round(float(invoice.grand_total) + float(taxes_total)), invoice.currency))
         frappe.db.commit()
 def get_device(device):

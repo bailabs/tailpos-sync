@@ -9,6 +9,7 @@
   "company",
   "item_group_device",
   "device_item_group",
+  "device_categories",
   "mode_of_payment_section",
   "cash_mop",
   "card_mop",
@@ -67,9 +68,15 @@
    "fieldname": "company",
    "fieldtype": "Data",
    "label": "Company"
+  },
+  {
+   "fieldname": "device_categories",
+   "fieldtype": "Table",
+   "label": "Device Categories",
+   "options": "Device Category"
   }
  ],
- "modified": "2020-03-13 14:35:37.703520",
+ "modified": "2020-03-17 08:28:43.833568",
  "modified_by": "Administrator",
  "module": "TailPOS Sync",
  "name": "Device",

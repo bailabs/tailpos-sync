@@ -135,6 +135,7 @@ def get_items_with_price_list_query(device,columns=None, pos_profile=None,):
 
     price_list = _get_price_list(pos_profile)
     item_group = get_device_item_group(device)
+    categories = get_device_categories(device)
     condition = ""
     if len(item_group) > 0:
         condition += "AND ("
@@ -143,6 +144,15 @@ def get_items_with_price_list_query(device,columns=None, pos_profile=None,):
             if int(idx) < int(len(item_group) - 1):
                 condition += "OR"
         condition += ")"
+
+    if len(categories) > 0:
+        condition += "AND ("
+        for idx, ii in enumerate(categories):
+            condition += "`tabItem`.category = '{0}' ".format(ii)
+            if int(idx) < int(len(categories) - 1):
+                condition += "OR"
+        condition += ")"
+
     columns_str = ', '.join(columns) if columns else '*'
     query = """
       SELECT %s FROM `tabItem` 
@@ -167,9 +177,15 @@ def get_device_item_group(device):
     device_item_group = []
     item_group = frappe.db.sql(""" SELECT item_group FROM `tabDevice Item Group` WHERE parent=%s """,(device))
     for i in item_group:
-        print(i[0])
         device_item_group.append(i[0])
     return device_item_group
+
+def get_device_categories(device):
+    device_categories = []
+    categories = frappe.db.sql(""" SELECT category FROM `tabDevice Category` WHERE parent=%s """,(device))
+    for i in categories:
+        device_categories.append(i[0])
+    return device_categories
 # Where is this called?
 @frappe.whitelist()
 def save_item(doc, method):
