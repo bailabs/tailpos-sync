@@ -299,6 +299,9 @@ def new_doc(data, owner='Administrator'):
             'payment_types': get_payment_types(sync_object['type'])
         })
     elif db_name == 'Receipts':
+        print("RECEIIIIPPTS")
+        print("================================================================")
+        print(get_date_fromtimestamp(sync_object['date']))
         doc.update({
             'status': sync_object['status'].capitalize(),
             'shift': sync_object['shift'],
