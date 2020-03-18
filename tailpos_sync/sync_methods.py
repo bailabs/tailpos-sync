@@ -46,7 +46,7 @@ def get_category_query(device):
         for idx,category in enumerate(categories):
             condition += "name='{0}'".format(category)
             if int(idx) < int(len(categories) - 1):
-                condition += "OR"
+                condition += " OR "
 
         condition += ")"
 
