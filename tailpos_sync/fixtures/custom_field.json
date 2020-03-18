@@ -1,5 +1,6 @@
 [
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -45,6 +46,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -90,6 +92,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -135,51 +138,7 @@
   "width": null
  },
  {
-  "allow_on_submit": 0,
-  "bold": 0,
-  "collapsible": 0,
-  "collapsible_depends_on": null,
-  "columns": 0,
-  "default": null,
-  "depends_on": null,
-  "description": null,
-  "docstatus": 0,
-  "doctype": "Custom Field",
-  "dt": "Deleted Document",
-  "fetch_from": null,
-  "fetch_if_empty": 0,
-  "fieldname": "sync_status",
-  "fieldtype": "Data",
-  "hidden": 1,
-  "ignore_user_permissions": 0,
-  "ignore_xss_filter": 0,
-  "in_global_search": 0,
-  "in_list_view": 0,
-  "in_standard_filter": 0,
-  "insert_after": "deleted_doctype",
-  "label": "Sync Status",
-  "length": 0,
-  "modified": "2018-11-20 11:54:07.457412",
-  "name": "Deleted Document-sync_status",
-  "no_copy": 0,
-  "options": null,
-  "parent": null,
-  "parentfield": null,
-  "parenttype": null,
-  "permlevel": 0,
-  "precision": "",
-  "print_hide": 0,
-  "print_hide_if_no_value": 0,
-  "print_width": null,
-  "read_only": 1,
-  "report_hide": 0,
-  "reqd": 0,
-  "search_index": 0,
-  "translatable": 0,
-  "unique": 0,
-  "width": null
- },
- {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -225,6 +184,53 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
+  "allow_on_submit": 0,
+  "bold": 0,
+  "collapsible": 0,
+  "collapsible_depends_on": null,
+  "columns": 0,
+  "default": null,
+  "depends_on": null,
+  "description": null,
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Deleted Document",
+  "fetch_from": null,
+  "fetch_if_empty": 0,
+  "fieldname": "sync_status",
+  "fieldtype": "Data",
+  "hidden": 1,
+  "ignore_user_permissions": 0,
+  "ignore_xss_filter": 0,
+  "in_global_search": 0,
+  "in_list_view": 0,
+  "in_standard_filter": 0,
+  "insert_after": "deleted_doctype",
+  "label": "Sync Status",
+  "length": 0,
+  "modified": "2018-11-20 11:54:07.457412",
+  "name": "Deleted Document-sync_status",
+  "no_copy": 0,
+  "options": null,
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "permlevel": 0,
+  "precision": "",
+  "print_hide": 0,
+  "print_hide_if_no_value": 0,
+  "print_width": null,
+  "read_only": 1,
+  "report_hide": 0,
+  "reqd": 0,
+  "search_index": 0,
+  "translatable": 0,
+  "unique": 0,
+  "width": null
+ },
+ {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -270,6 +276,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -315,6 +322,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -360,6 +368,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -405,6 +414,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 1,
@@ -450,6 +460,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -495,6 +506,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -519,10 +531,10 @@
   "insert_after": "category",
   "label": "Color",
   "length": 0,
-  "modified": "2019-07-29 16:15:12.589353",
+  "modified": "2020-03-17 08:19:38.455678",
   "name": "Item-color",
   "no_copy": 0,
-  "options": "Tomato\nFire Brick\nBlue\nGray\nGreen\nDark Orange\nDark Magenta",
+  "options": "Tomato\nFire Brick\nBlue\nGray\nGreen\nDark Orange\nDark Magenta\nWhite",
   "parent": null,
   "parentfield": null,
   "parenttype": null,
@@ -540,6 +552,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -585,6 +598,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -630,6 +644,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -675,6 +690,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -720,6 +736,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -765,6 +782,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -810,6 +828,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -855,6 +874,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -900,6 +920,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -945,6 +966,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -990,6 +1012,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
@@ -1035,6 +1058,7 @@
   "width": null
  },
  {
+  "allow_in_quick_entry": 0,
   "allow_on_submit": 0,
   "bold": 0,
   "collapsible": 0,
