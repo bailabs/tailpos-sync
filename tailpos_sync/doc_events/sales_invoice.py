@@ -2,7 +2,11 @@ import frappe
 
 
 def validate(doc, method):
-    if doc.status == 0:
+    print("=====================================================================")
+    print("NAA MAN DIRI")
+    print(doc.docstatus)
+    if doc.docstatus == 0:
+        print("diri daw")
         taxes = []
         doc.taxes = []
         total_taxes = 0
@@ -36,3 +40,5 @@ def validate(doc, method):
         doc.total_taxes_and_charges = total_taxes
         doc.grand_total = total_taxes + doc.total
         doc.outstanding_amount = total_taxes + doc.total
+        print("naa pud diriiiiii")
+        print("=======================================================================")
