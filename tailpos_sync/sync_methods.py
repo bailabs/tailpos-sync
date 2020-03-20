@@ -51,7 +51,6 @@ def get_category_query(device):
         condition += ")"
 
     query = """SELECT * FROM `tabCategories` {0}""".format(condition)
-    print(query)
     return query
 def test():
     pos_profile = frappe.db.get_value('Device', "f2ef25d668", 'pos_profile')
@@ -126,7 +125,6 @@ def insert_data(data, frappe_table, receipt_total):
             frappe_table.db_set("type", "Fix Discount")
 
         if value == "percentage":
-            print(db_name)
             frappe_table.db_set("discountType", "Percentage")
 
         if field_name == "date":
@@ -186,7 +184,6 @@ def get_deleted_documents():
 
 
 def sync_from_erpnext(device=None, force_sync=True):
-    print('didir man ata')
     data = []
     tables = get_tables_for_sync()
     pos_profile = frappe.db.get_value('Device', device, 'pos_profile')
@@ -299,9 +296,6 @@ def new_doc(data, owner='Administrator'):
             'payment_types': get_payment_types(sync_object['type'])
         })
     elif db_name == 'Receipts':
-        print("RECEIIIIPPTS")
-        print("================================================================")
-        print(get_date_fromtimestamp(sync_object['date']))
         doc.update({
             'status': sync_object['status'].capitalize(),
             'shift': sync_object['shift'],

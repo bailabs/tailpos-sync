@@ -2,8 +2,6 @@ import frappe
 
 
 def validate(doc, method):
-    print("DOCSTAAATUS")
-    print(doc.docstatus)
     if doc.status == 0:
         taxes = []
         doc.taxes = []
