@@ -62,7 +62,7 @@ def generate_si_from_receipts():
         debit_to = get_debit_to(company)
 
         if len(type) > 0:
-            mop = _get_mode_of_payment(type, device=device)
+            mop = _get_mode_of_payment(type, receipt.name,device=device)
 
         si = frappe.get_doc({
             'doctype': 'Sales Invoice',
@@ -102,11 +102,15 @@ def _insert_invoice(invoice, mop, taxes_total, submit=False, allow_negative_stoc
     invoice.insert()
     total_paid = 0
     if len(mop) > 0:
+
         for x in mop:
+
             invoice.append('payments', {
                 'mode_of_payment': x['mode_of_payment'],
+                'type': x['type'],
                 'amount': x['amount']
             })
+
             total_paid += x['amount']
 
     else:
@@ -126,15 +130,10 @@ def _insert_invoice(invoice, mop, taxes_total, submit=False, allow_negative_stoc
     if submit and not check_stock_qty:
         invoice.submit()
         from frappe.utils import money_in_words
-        frappe.db.set_value("Sales Invoice", invoice.name, "total_taxes_and_charges", taxes_total)
-        frappe.db.set_value("Sales Invoice", invoice.name, "total_taxes_and_charges", taxes_total)
-        frappe.db.set_value("Sales Invoice", invoice.name, "grand_total", float(invoice.grand_total) + float(taxes_total))
         frappe.db.set_value("Sales Invoice", invoice.name, "rounded_total", round(float(invoice.grand_total) + float(taxes_total)))
-        frappe.db.set_value("Sales Invoice", invoice.name, "outstanding_amount", round(float(invoice.grand_total) + float(taxes_total)))
+        frappe.db.set_value("Sales Invoice", invoice.name, "outstanding_amount", round(float(invoice.grand_total), 2))
         frappe.db.set_value("Sales Invoice", invoice.name, "paid_amount", total_paid)
-        frappe.db.set_value("Sales Invoice", invoice.name, "change_amount", total_paid - (round(float(invoice.grand_total) + float(taxes_total))))
-        frappe.db.set_value("Sales Invoice", invoice.name, "base_change_amount", total_paid - (round(float(invoice.grand_total) + float(taxes_total))))
-        frappe.db.set_value("Sales Invoice", invoice.name, "in_words", money_in_words(round(float(invoice.grand_total) + float(taxes_total)), invoice.currency))
+        frappe.db.set_value("Sales Invoice", invoice.name, "in_words", money_in_words(round(float(invoice.grand_total),2), invoice.currency))
         frappe.db.commit()
 def get_device(device):
     device_data = frappe.db.sql(""" SELECT * FROM `tabDevice` WHERE name=%s """, device)
@@ -154,9 +153,9 @@ def _get_receipts_payment_type(receipt):
     payment = frappe.db.sql_list("""SELECT name FROM `tabPayments` WHERE receipt=%s""", receipt)
     return frappe.db.sql(""" SELECT * FROM `tabPayment Types` WHERE parent=%s """, payment[0], as_dict=True)
 
-def _get_mode_of_payment(type, device=None):
+def _get_mode_of_payment(type,receipt, device=None):
     if device:
-        return _get_device_mode_of_payment(device, type)
+        return _get_device_mode_of_payment(device, receipt, type)
     mode_of_payment = []
     for i in type:
         mop = frappe.get_all('Tail Settings Payment', filters={'payment_type': i.type}, fields=['mode_of_payment'])
@@ -173,19 +172,22 @@ def _get_mode_of_payment(type, device=None):
     return mode_of_payment
 
 
-def _get_device_mode_of_payment(device, type):
+def _get_device_mode_of_payment(device, receipt, type):
     mode_of_payment = []
+    payment = frappe.db.sql(""" SELECT * FROM `tabPayments` WHERE receipt=%s """, receipt, as_dict=True)[0]
     for i in type:
-        mop = frappe.get_all('Device Payment', filters={'parent': device, 'payment_type': i.type}, fields=['mode_of_payment'])
+        mop = frappe.get_all('Device Payment', filters={'parent': device, 'payment_type': i.type}, fields=['mode_of_payment', 'payment_type'])
 
         if not mop:
             frappe.throw(
                 _('Set the device mode of payment for {} in device {}'.format(i.type,device))
             )
         else:
+
             mode_of_payment.append({
                 "mode_of_payment": mop[0].mode_of_payment,
-                "amount": i.amount
+                "type": mop[0].payment_type,
+                "amount": i.amount if "*" not in mop[0].payment_type else i.amount - payment.change
             })
     return mode_of_payment
 
