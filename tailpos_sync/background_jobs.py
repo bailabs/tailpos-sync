@@ -25,7 +25,7 @@ def generate_si_from_receipts():
     customer = frappe.db.get_value('POS Profile', pos_profile, 'customer')
 
     receipts = frappe.db.sql("""
-        SELECT name FROM `tabReceipts`
+        SELECT * FROM `tabReceipts`
         WHERE generated = 0
         LIMIT %(limit)s
     """, {'limit': int(generate_limit)}, as_dict=True)
@@ -83,7 +83,7 @@ def generate_si_from_receipts():
                 'rate': item['price'],
                 'qty': item['qty'],
             })
-        _insert_invoice(si, mop, receipt_info.taxesvalue, submit_invoice, allow_negative_stock)
+        _insert_invoice(si, mop, receipt_info.taxesvalue,receipt, submit_invoice, allow_negative_stock)
 
 
         # ticked `Generated Sales Invoice`
@@ -98,7 +98,7 @@ def get_debit_to(company):
     # return frappe.db.sql(""" SELECT name FROM `tabAccount` WHERE name like %s """, "%Debtors%")[0][0]
 
 
-def _insert_invoice(invoice, mop, taxes_total, submit=False, allow_negative_stock=False):
+def _insert_invoice(invoice, mop, taxes_total,receipt, submit=False, allow_negative_stock=False):
     invoice.insert()
     total_paid = 0
     if len(mop) > 0:
@@ -129,9 +129,24 @@ def _insert_invoice(invoice, mop, taxes_total, submit=False, allow_negative_stoc
     invoice.reload()
     if submit and not check_stock_qty:
         invoice.submit()
+        value = round(float(invoice.grand_total), 2)
+        print("ROUNDOOOOOOOFFFFFF")
+        print(receipt.roundoff)
+        if receipt.roundoff:
+            remainder = float(receipt.total_amount) % int(receipt.total_amount)
+            print(remainder)
+            if remainder > 0.05:
+                value = int(receipt.total_amount) + 1
+            else:
+                value = int(receipt.total_amount)
+        print(value)
         from frappe.utils import money_in_words
+        frappe.db.set_value("Sales Invoice", invoice.name, "status", "Paid")
         frappe.db.set_value("Sales Invoice", invoice.name, "rounded_total", round(float(invoice.grand_total) + float(taxes_total)))
-        frappe.db.set_value("Sales Invoice", invoice.name, "outstanding_amount", round(float(invoice.grand_total), 2))
+        frappe.db.set_value("Sales Invoice", invoice.name, "grand_total", value)
+        frappe.db.set_value("Sales Invoice", invoice.name, "outstanding_amount", value)
+        frappe.db.set_value("Sales Invoice", invoice.name, "change_amount", 0)
+        frappe.db.set_value("Sales Invoice", invoice.name, "base_change_amount", 0)
         frappe.db.set_value("Sales Invoice", invoice.name, "paid_amount", total_paid)
         frappe.db.set_value("Sales Invoice", invoice.name, "in_words", money_in_words(round(float(invoice.grand_total),2), invoice.currency))
         frappe.db.commit()

@@ -299,6 +299,7 @@ def new_doc(data, owner='Administrator'):
         doc.update({
             'status': sync_object['status'].capitalize(),
             'shift': sync_object['shift'],
+            'roundoff': sync_object['roundOff'],
             'customer': sync_object['customer'],
             'attendant': sync_object['attendant'],
             'taxesvalue': round(sync_object['taxesAmount'],2),
