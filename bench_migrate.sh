@@ -1,5 +1,6 @@
 
 git reset --hard
+git pull
 cd ../..
 bench --site site1.local migrate
 
