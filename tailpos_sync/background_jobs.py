@@ -83,6 +83,7 @@ def generate_si_from_receipts():
                 'rate': item['price'],
                 'qty': item['qty'],
             })
+        si.receipt = True
         _insert_invoice(si, mop, receipt_info.taxesvalue,receipt, submit_invoice, allow_negative_stock)
 
 

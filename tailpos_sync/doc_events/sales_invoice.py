@@ -2,7 +2,7 @@ import frappe
 
 
 def validate(doc, method):
-    if doc.docstatus == 0:
+    if doc.docstatus == 0 and "receipt" in doc.__dict__:
         taxes = []
         doc.taxes = []
         total_taxes = 0
