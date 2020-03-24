@@ -56,6 +56,7 @@ class Receipts(Document):
 
 	def validate(self):
 		set_date_updated(self)
+		self.status = "Completed"
 		self.compute_subtotal()
 		self.compute_total_tax()
 		self.compute_total()

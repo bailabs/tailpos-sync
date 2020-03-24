@@ -34,3 +34,8 @@ def validate(doc, method):
                                 total_taxes += (i.tax_rate / 100) * sales_invoice_item['amount']
 
         doc.total_taxes_and_charges = total_taxes
+
+def before_submit(doc, method):
+    doc.change_amount = 0
+    doc.base_change_amount = 0
+    doc.outstanding_amount = 0

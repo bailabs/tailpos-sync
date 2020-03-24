@@ -128,6 +128,7 @@ doc_events = {
     },
     "Sales Invoice": {
         "validate": "tailpos_sync.doc_events.sales_invoice.validate",
+        "before_submit": "tailpos_sync.doc_events.sales_invoice.before_submit",
     },
     "Payment Entry": {
         "on_submit": "tailpos_sync.doc_events.payment_entry.on_submit",

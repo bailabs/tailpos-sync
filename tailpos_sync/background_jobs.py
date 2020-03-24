@@ -73,7 +73,7 @@ def generate_si_from_receipts():
             "due_date": receipt_info.date,
             "customer": receipt_customer or customer,
             "customer_name": customer_name,
-            "title": customer_name,
+            "title": customer_name
         })
         item_tax_template_record = []
         for item in items:
@@ -102,9 +102,7 @@ def _insert_invoice(invoice, mop, taxes_total,receipt, submit=False, allow_negat
     invoice.insert()
     total_paid = 0
     if len(mop) > 0:
-
         for x in mop:
-
             invoice.append('payments', {
                 'mode_of_payment': x['mode_of_payment'],
                 'type': x['type'],
@@ -120,6 +118,24 @@ def _insert_invoice(invoice, mop, taxes_total,receipt, submit=False, allow_negat
         })
         total_paid += invoice.outstanding_amount
     invoice.set_missing_values()
+    invoice.paid_amount = total_paid
+    invoice.round_off = receipt.roundoff
+
+    value = round(float(invoice.grand_total), 2) + round(float(invoice.total_taxes_and_charges), 2)
+
+    if receipt.roundoff:
+        remainder = float(value) % int(value)
+        if remainder > 0.05:
+            value = (int(value) + 1) - value
+        else:
+            value = value - int(value)
+
+    invoice.write_off_amount = value
+    invoice.change_amount = 0
+    invoice.base_change_amount = 0
+
+    from frappe.utils import money_in_words
+    invoice.in_words = money_in_words(round(float(invoice.grand_total),2), invoice.currency)
     invoice.save()
     frappe.db.set_value("Sales Invoice", invoice.name, "tax_category", "")
 
@@ -129,26 +145,8 @@ def _insert_invoice(invoice, mop, taxes_total,receipt, submit=False, allow_negat
     invoice.reload()
     if submit and not check_stock_qty:
         invoice.submit()
-        value = round(float(invoice.grand_total), 2)
-        print("ROUNDOOOOOOOFFFFFF")
-        print(receipt.roundoff)
-        if receipt.roundoff:
-            remainder = float(receipt.total_amount) % int(receipt.total_amount)
-            print(remainder)
-            if remainder > 0.05:
-                value = int(receipt.total_amount) + 1
-            else:
-                value = int(receipt.total_amount)
-        print(value)
-        from frappe.utils import money_in_words
         frappe.db.set_value("Sales Invoice", invoice.name, "status", "Paid")
-        frappe.db.set_value("Sales Invoice", invoice.name, "rounded_total", round(float(invoice.grand_total) + float(taxes_total)))
-        frappe.db.set_value("Sales Invoice", invoice.name, "grand_total", value)
-        frappe.db.set_value("Sales Invoice", invoice.name, "outstanding_amount", value)
-        frappe.db.set_value("Sales Invoice", invoice.name, "change_amount", 0)
-        frappe.db.set_value("Sales Invoice", invoice.name, "base_change_amount", 0)
-        frappe.db.set_value("Sales Invoice", invoice.name, "paid_amount", total_paid)
-        frappe.db.set_value("Sales Invoice", invoice.name, "in_words", money_in_words(round(float(invoice.grand_total),2), invoice.currency))
+        frappe.db.set_value("Sales Invoice", invoice.name, "outstanding_amount", 0)
         frappe.db.commit()
 def get_device(device):
     device_data = frappe.db.sql(""" SELECT * FROM `tabDevice` WHERE name=%s """, device)
