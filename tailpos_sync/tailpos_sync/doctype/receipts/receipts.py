@@ -31,7 +31,7 @@ class Receipts(Document):
 		self.set_default_values()
 
 	def compute_total(self):
-		total = (self.subtotal + self.taxesvalue) - round(self.subtotal * self.discountvalue, 2)
+		total = (self.subtotal + self.taxesvalue) - self.discountvalue
 
 		if self.roundoff:
 			remainder = float(total) % int(total)
@@ -47,6 +47,7 @@ class Receipts(Document):
 		for item in self.receipt_lines:
 			subtotal += (float(item.__dict__['qty']) * float(item.__dict__['price']))
 		self.subtotal = subtotal
+
 	def compute_total_tax(self):
 		taxes = 0
 		for tax in self.receipt_taxes:
