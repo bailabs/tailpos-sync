@@ -293,7 +293,8 @@ def new_doc(data, owner='Administrator'):
             'paid': sync_object['paid'],
             'receipt': sync_object['receipt'],
             'date': get_date_fromtimestamp(sync_object['date']),
-            'payment_types': get_payment_types(sync_object['type'])
+            'payment_types': get_payment_types(sync_object['type']),
+            'deviceid': sync_object['deviceId'],
         })
     elif db_name == 'Receipts':
         doc.update({
