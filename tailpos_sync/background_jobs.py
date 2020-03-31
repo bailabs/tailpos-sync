@@ -122,18 +122,28 @@ def _insert_invoice(invoice, mop, taxes_total,receipt, submit=False, allow_negat
     invoice.paid_amount = total_paid
     invoice.round_off = receipt.roundoff
 
-    value = round(float(invoice.grand_total), 2) + round(float(invoice.total_taxes_and_charges), 2)
 
     if receipt.roundoff:
+        print("=================================")
+        value = (round(float(invoice.grand_total), 2) + round(float(receipt.taxesvalue), 2)) - float(
+            receipt.discount_amount)
+        print(round(float(invoice.grand_total), 2))
+        print(round(float(invoice.total_taxes_and_charges), 2))
+        print(float(receipt.discount_amount))
         remainder = float(value) % int(value)
         if remainder > 0.05:
             value = (int(value) + 1) - value
         else:
             value = value - int(value)
+        print(value)
+        print("=================================")
 
-    invoice.write_off_amount = value
+        invoice.write_off_amount = value
     invoice.change_amount = 0
     invoice.base_change_amount = 0
+    invoice.apply_discount_on = "Net Total"
+    invoice.additional_discount_percentage = receipt.discountvalue
+    invoice.discount_amount = receipt.discount_amount
 
     from frappe.utils import money_in_words
     invoice.in_words = money_in_words(round(float(invoice.grand_total),2), invoice.currency)
@@ -201,7 +211,7 @@ def _get_device_mode_of_payment(device, receipt, type):
             mode_of_payment.append({
                 "mode_of_payment": mop[0].mode_of_payment,
                 "type": mop[0].payment_type,
-                "amount": i.amount if "*" not in mop[0].payment_type else i.amount - payment.change
+                "amount": i.amount if "*" not in mop[0].payment_type and i.amount >= payment.change else i.amount - payment.change
             })
     return mode_of_payment
 

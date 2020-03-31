@@ -31,8 +31,24 @@ def fetch_items():
 
 @frappe.whitelist(allow_guest=True)
 def fetch_categories():
-    return frappe.get_all('Categories', fields=['name'])
-
+    data = json.loads(frappe.request.data)
+    device = _validate_device(data.get('device'))
+    categories = _get_categories_filter(device)
+    print("CATEGORIIIIIIIIIIIIIIIIIIIIIIIIIIIIIES")
+    print(categories)
+    if len(categories) == 0:
+        return frappe.get_all('Categories', fields=['name'])
+    else:
+        item_groups_query = ""
+        if categories:
+            get_filter = compose(
+                ', '.join,
+                partial(map, lambda category: '\'%s\'' % category)
+            )
+            item_groups_query += ' WHERE name IN (%s)' % get_filter(categories)
+        query = """ SELECT * FROM `tabCategories` {0}""".format(item_groups_query)
+        print(query)
+        return frappe.db.sql(query, as_dict=True)
 
 @frappe.whitelist(allow_guest=True)
 def fetch_remarks():
@@ -40,7 +56,6 @@ def fetch_remarks():
 
 
 def get_items_with_price_list_rate(pos_profile=None, item_groups=None, categories=None):
-    print("NAA PUD DIRI")
     if not pos_profile:
         pos_profile = frappe.db.get_single_value('Tail Settings', 'pos_profile')
 

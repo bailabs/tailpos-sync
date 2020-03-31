@@ -25,6 +25,7 @@
   "roundoff",
   "column_break_16",
   "discountvalue",
+  "discount_amount",
   "additional_section",
   "shift",
   "attendant",
@@ -122,7 +123,7 @@
   {
    "fieldname": "discountvalue",
    "fieldtype": "Currency",
-   "label": "Discount Amount",
+   "label": "Discount Value",
    "read_only": 1
   },
   {
@@ -226,9 +227,15 @@
    "fieldtype": "Check",
    "label": "Roundoff",
    "read_only": 1
+  },
+  {
+   "fieldname": "discount_amount",
+   "fieldtype": "Data",
+   "label": "Discount Amount",
+   "read_only": 1
   }
  ],
- "modified": "2020-03-23 12:36:54.360918",
+ "modified": "2020-03-31 03:33:42.601241",
  "modified_by": "Administrator",
  "module": "TailPOS Sync",
  "name": "Receipts",

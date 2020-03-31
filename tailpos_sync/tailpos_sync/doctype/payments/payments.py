@@ -19,6 +19,7 @@ class Payments(Document):
 	def validate(self):
 		set_date_updated(self)
 		self.compute_receipt_total()
+
 	def compute_receipt_total(self):
 		receipt = frappe.db.sql(""" SELECT total_amount FROM tabReceipts WHERE name=%s """, self.receipt, as_dict=True)
 		change = self.paid - receipt[0].total_amount

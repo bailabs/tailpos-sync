@@ -3,6 +3,7 @@ import frappe
 
 def validate(doc, method):
     if doc.docstatus == 0 and "receipt" in doc.__dict__:
+        doc.net_total = 0
         taxes = []
         doc.taxes = []
         total_taxes = 0
@@ -14,7 +15,7 @@ def validate(doc, method):
                     if i.tax_type not in taxes:
                         taxes.append(i.tax_type)
                         doc.append("taxes",{
-                            "charge_type": "On Net Total",
+                            "charge_type": "Actual",
                             "account_head": i.tax_type,
                             "rate": 0,
                             "description": i.tax_type.split("-")[0],
