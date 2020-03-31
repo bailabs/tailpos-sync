@@ -68,33 +68,13 @@ def get_invoices(filters):
 
 def modify_records(invoices):
     indexes = []
-    totals = []
-    totals_per_group = {
-        "qty": "Totals",
-        "rate": 0,
-        "amount": 0,
-        "packed_qty": 0,
-        "packed_valuation_rate": 0,
-    }
+
     for idx, value in enumerate(invoices):
-        totals_per_group['rate'] += invoices[idx].rate
-        totals_per_group['amount'] += invoices[idx].amount
-        totals_per_group['packed_qty'] += invoices[idx].packed_qty
-        totals_per_group['packed_valuation_rate'] += invoices[idx].packed_valuation_rate
-        if idx + 1 < len(invoices):
+       if idx + 1 < len(invoices):
             if "item_code" in invoices[idx] and invoices[idx].item_code != invoices[idx + 1].item_code:
                 indexes.append(idx + 1)
-                totals.append(totals_per_group)
-                totals_per_group = {
-                    "qty": "Totals",
-                    "rate": 0,
-                    "amount": 0,
-                    "packed_qty": 0,
-                    "packed_valuation_rate": 0,
-                }
 
 
-    for iidx, value in enumerate(indexes):
-        invoices.insert(value, totals[iidx])
-    invoices.append(totals_per_group)
-    print("wala man diri")
+
+    for i in indexes:
+        invoices.insert(i, {})
