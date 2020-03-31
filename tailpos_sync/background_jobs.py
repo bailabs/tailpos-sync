@@ -141,9 +141,10 @@ def _insert_invoice(invoice, mop, taxes_total,receipt, submit=False, allow_negat
         invoice.write_off_amount = value
     invoice.change_amount = 0
     invoice.base_change_amount = 0
-    invoice.apply_discount_on = "Net Total"
-    invoice.additional_discount_percentage = receipt.discountvalue
-    invoice.discount_amount = receipt.discount_amount
+    if receipt.discount_amount > 0:
+        invoice.apply_discount_on = "Net Total"
+        invoice.additional_discount_percentage = receipt.discountvalue
+        invoice.discount_amount = receipt.discount_amount
 
     from frappe.utils import money_in_words
     invoice.in_words = money_in_words(round(float(invoice.grand_total),2), invoice.currency)
