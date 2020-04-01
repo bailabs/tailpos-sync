@@ -58,7 +58,7 @@ class Receipts(Document):
 		if self.discounttype == "Percentage":
 			self.discount_amount = round((self.discountvalue/100) * self.subtotal,2)
 		else:
-			self.discount_amount = round(self.discountvalue)
+			self.discount_amount = self.discountvalue
 	def validate(self):
 		set_date_updated(self)
 		self.status = "Completed"
