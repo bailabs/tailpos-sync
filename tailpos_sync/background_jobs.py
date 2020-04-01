@@ -143,7 +143,7 @@ def _insert_invoice(invoice, mop, taxes_total,receipt, submit=False, allow_negat
     invoice.base_change_amount = 0
     if float(receipt.discount_amount) > 0:
         invoice.apply_discount_on = "Net Total"
-        invoice.additional_discount_percentage = receipt.discountvalue if receipt.discounttype == "Percentage" else 0
+        invoice.additional_discount_percentage = float(receipt.discountvalue) if receipt.discounttype == "Percentage" else 0
         invoice.discount_amount = float(receipt.discount_amount)
 
     from frappe.utils import money_in_words
