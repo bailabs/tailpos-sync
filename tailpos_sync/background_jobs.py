@@ -212,7 +212,7 @@ def _get_device_mode_of_payment(device, receipt, type):
             mode_of_payment.append({
                 "mode_of_payment": mop[0].mode_of_payment,
                 "type": mop[0].payment_type,
-                "amount": i.amount if "*" not in mop[0].payment_type and i.amount >= payment.change else i.amount - payment.change
+                "amount": i.amount if "*" not in mop[0].payment_type else i.amount - payment.change
             })
     return mode_of_payment
 
