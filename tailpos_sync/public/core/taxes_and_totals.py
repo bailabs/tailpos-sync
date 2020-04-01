@@ -421,7 +421,7 @@ class calculate_taxes_and_totals(object):
 			tax.item_wise_tax_detail = json.dumps(tax.item_wise_tax_detail, separators=(',', ':'))
 
 	def set_discount_amount(self):
-		if float(self.doc.additional_discount_percentage) > 0:
+		if self.doc.additional_discount_percentage and float(self.doc.additional_discount_percentage) > 0:
 			self.doc.discount_amount = flt(flt(self.doc.get(scrub(self.doc.apply_discount_on)))
 				* self.doc.additional_discount_percentage / 100, self.doc.precision("discount_amount"))
 
