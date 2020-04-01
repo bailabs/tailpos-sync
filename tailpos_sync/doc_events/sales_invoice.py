@@ -40,3 +40,7 @@ def before_submit(doc, method):
     doc.change_amount = 0
     doc.base_change_amount = 0
     doc.outstanding_amount = 0
+    doc.posting_date = doc.due_date
+
+def after_submit(doc, method):
+    doc.posting_date = doc.due_date

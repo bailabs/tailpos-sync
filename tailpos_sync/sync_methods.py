@@ -297,10 +297,6 @@ def new_doc(data, owner='Administrator'):
             'deviceid': sync_object['deviceId'],
         })
     elif db_name == 'Receipts':
-        print("RECEIIIIIIIIIIIIIPT")
-        print(sync_object['discount'])
-        print(sync_object['discountValue'])
-        print(sync_object['discountType'])
         doc.update({
             'status': sync_object['status'].capitalize(),
             'shift': sync_object['shift'],
@@ -311,7 +307,7 @@ def new_doc(data, owner='Administrator'):
             'discount': sync_object['discount'],
             'reason': sync_object['reason'],
             'deviceid': sync_object['deviceId'],
-            'discountvalue': sync_object['discountValue'] * 100,
+            'discountvalue': sync_object['discountValue'] * 100 if sync_object['discountType'] == "percentage" else sync_object['discountValue'],
             'receiptnumber': sync_object['receiptNumber'],
             'discounttype': sync_object['discountType'].title(),
             'date': get_date_fromtimestamp(sync_object['date']),
