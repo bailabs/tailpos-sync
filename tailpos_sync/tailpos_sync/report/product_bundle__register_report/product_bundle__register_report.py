@@ -8,6 +8,5 @@ def execute(filters=None):
 	columns, data = [], []
 
 	get_columns(columns)
-	invoices = get_invoices(filters)
-	data = invoices
+	invoices = get_invoices(filters, data)
 	return columns, data
