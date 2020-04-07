@@ -42,7 +42,8 @@ fixtures = [
                     "Customer Credit Limit-total_prepaid_balance",
                     "Error Log-device_id",
                     "Error Log-wallet_card",
-                    "Error Log-pin"
+                    "Error Log-pin",
+                    "Sales Invoice-receipt"
                 ]
             ]
         ]

@@ -73,7 +73,8 @@ def generate_si_from_receipts():
             "due_date": receipt_info.date,
             "customer": receipt_customer or customer,
             "customer_name": customer_name,
-            "title": customer_name
+            "title": customer_name,
+            "receipt": True
         })
         item_tax_template_record = []
         for item in items:
@@ -83,7 +84,6 @@ def generate_si_from_receipts():
                 'rate': item['price'],
                 'qty': item['qty'],
             })
-        si.receipt = True
         _insert_invoice(si, mop, receipt_info.taxesvalue,receipt, submit_invoice, allow_negative_stock)
 
 
@@ -122,22 +122,14 @@ def _insert_invoice(invoice, mop, taxes_total,receipt, submit=False, allow_negat
     invoice.paid_amount = total_paid
     invoice.round_off = receipt.roundoff
 
-
     if receipt.roundoff:
-        print("=================================")
         value = (round(float(invoice.grand_total), 2) + round(float(receipt.taxesvalue), 2)) - float(
             receipt.discount_amount)
-        print(round(float(invoice.grand_total), 2))
-        print(round(float(invoice.total_taxes_and_charges), 2))
-        print(float(receipt.discount_amount))
         remainder = float(value) % int(value)
         if remainder > 0.05:
             value = (int(value) + 1) - value
         else:
             value = value - int(value)
-        print(value)
-        print("=================================")
-
         invoice.write_off_amount = value
     invoice.change_amount = 0
     invoice.base_change_amount = 0

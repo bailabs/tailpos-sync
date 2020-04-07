@@ -31,7 +31,7 @@ class Receipts(Document):
 		self.set_default_values()
 
 	def compute_total(self):
-		total = (self.subtotal + self.taxesvalue) - self.discount_amount
+		total = (float(self.subtotal) + float(self.taxesvalue)) - float(self.discount_amount)
 
 		if self.roundoff:
 			remainder = float(total) % int(total)

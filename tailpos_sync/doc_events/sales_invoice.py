@@ -2,7 +2,7 @@ import frappe
 
 
 def validate(doc, method):
-    if doc.docstatus == 0 and "receipt" in doc.__dict__:
+    if doc.docstatus == 0 and doc.receipt:
         doc.net_total = 0
         taxes = []
         doc.taxes = []
@@ -37,10 +37,12 @@ def validate(doc, method):
         doc.total_taxes_and_charges = total_taxes
 
 def before_submit(doc, method):
-    doc.change_amount = 0
-    doc.base_change_amount = 0
-    doc.outstanding_amount = 0
-    doc.posting_date = doc.due_date
+    if doc.receipt:
+        doc.change_amount = 0
+        doc.base_change_amount = 0
+        doc.outstanding_amount = 0
+        doc.posting_date = doc.due_date
 
 def after_submit(doc, method):
-    doc.posting_date = doc.due_date
+    if doc.receipt:
+        doc.posting_date = doc.due_date
